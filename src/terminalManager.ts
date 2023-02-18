@@ -1,5 +1,6 @@
 import type { Terminal } from 'xterm';
 import Programs, { ProgramInterface } from './programs';
+import introduction from "../static/introduction.txt?raw";
 
 export class TerminalManager {
     private _terminal: Terminal;
@@ -17,6 +18,7 @@ export class TerminalManager {
     constructor(terminal: Terminal) {
         this._terminal = terminal;
         this.setupInputHandler();
+        this._terminal.writeln(introduction);
         this._terminal.write(this.prompt());
         const historyString = window.localStorage.getItem("history");
         if (historyString !== null) {
