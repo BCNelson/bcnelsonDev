@@ -1,5 +1,5 @@
-import type { ProgramInterface } from "./interface";
-import { Program } from "./base";
+import type { ProgramInterface } from "../interface";
+import { Program } from "../base";
 
 export default {
     run: async (programInterface: ProgramInterface): Promise<number> => {

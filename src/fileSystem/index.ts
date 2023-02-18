@@ -2,7 +2,11 @@ import { Directory } from "./types";
 
 export default {
     name: '',
-    files: [],
+    files: [{
+        name: 'README.md',
+        type: 'text',
+        content: 'Welcome to my website! Feel free to poke around and see what you can find.'
+    }],
     directories: [{
         name: 'home',
         files: [],
