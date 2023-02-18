@@ -1,5 +1,4 @@
 import type { Terminal } from 'xterm';
-import ansiEscapes from 'ansi-escapes';
 import Programs, { ProgramInterface } from './programs';
 
 export class TerminalManager {

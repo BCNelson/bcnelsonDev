@@ -1,6 +1,5 @@
 import type { ProgramInterface } from "../interface";
 import { Program } from "../base";
-import { getContents, resolvePath } from "../../fileSystem/utils";
 
 export default {
     run: async (programInterface: ProgramInterface): Promise<number> => {
