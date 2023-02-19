@@ -125,6 +125,7 @@ export class TerminalManager {
         const program = Programs.get(programName);
         if (program) {
             const programInterface = new ProgramInterface(this._terminal, args, this.env, this);
+            umami.trackEvent("programExec", { programName, args, env: this.env });
             await program.run(programInterface)
         } else {
             this._terminal.writeln(programName + ": command not found");
@@ -139,7 +140,7 @@ export class TerminalManager {
         if (path.startsWith(this.env.HOME)) {
             path = "~" + path.slice(this.env.HOME.length);
         }
-        return `visitor@bcnelson.dev ${c.green(path)}> `
+        return `${c.green('visitor')}@bcnelson.dev ${c.greenBright(path)}> `
     }
 
     private addHistory(input: string): void {
