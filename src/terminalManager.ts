@@ -1,6 +1,7 @@
 import type { Terminal } from 'xterm';
 import Programs, { ProgramInterface } from './programs';
 import introduction from "../static/introduction.txt?raw";
+import chalk from 'chalk';
 
 export class TerminalManager {
     private _terminal: Terminal;
@@ -137,7 +138,7 @@ export class TerminalManager {
         if (path.startsWith(this.env.HOME)) {
             path = "~" + path.slice(this.env.HOME.length);
         }
-        return `${path}$ `
+        return `visitor@bcnelson.dev ${chalk.green(path)}> `
     }
 
     private addHistory(input: string): void {
