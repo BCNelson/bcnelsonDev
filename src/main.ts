@@ -7,6 +7,8 @@ if (terminalContainer) {
   const terminal = new Terminal({
     cursorBlink: true,
     convertEol: true,
+    scrollback: 1000,
+    fontFamily: 'Roboto Mono, Ubuntu Mono, courier-new, courier, monospace',
   })
   terminal.open(terminalContainer)
   new TerminalManager(terminal);

@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script type="module" src="/src/main.ts"></script>
+  <meta charset="UTF-8" />
   <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+  <link rel="stylesheet" href="./src/style.css" />
   <meta name="viewport" content="width=device-width">
   <meta name="description" content="Personal Website for Bradley Nelson">
   <title>Terminal - Bradley Nelson</title>
 </head>
 
-<body>
-  <div id="terminal"></div>
+<body class="bg-gradient-to-r from-gray-500 to-blue-500">
+  <div class="ring ring-offset-8 ring-offset-black ring-blue-600 md:m-5 rounded-lg" id="terminal"></div>
 </body>
-
+<script type="module" src="/src/main.ts"></script>
 </html>
