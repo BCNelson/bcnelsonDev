@@ -1,2 +1,0 @@
-Welcome to the personal site for Bradley Nelson, a backend software engineer
-you can type help for a list of commands.

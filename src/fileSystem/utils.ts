@@ -1,6 +1,8 @@
 import root from "./index";
 import { Directory } from "./types";
-export async function getContents(absolutePath: string, filesystem = root): Promise<string | Uint8Array> {
+import { File } from "./types";
+
+export async function getFile(absolutePath: string, filesystem = root): Promise<File> {
     if(!absolutePath.startsWith('/')) throw new Error('Absolute path must start with /');
     if(absolutePath.endsWith('/')) throw new Error('Absolute path must be a file');
     const path = absolutePath.split('/').filter((p) => p !== '');
@@ -17,6 +19,19 @@ export async function getContents(absolutePath: string, filesystem = root): Prom
     if(!file) {
         throw new Error(`${absolutePath}: No such file or directory`);
     }
+    return file;
+}
+
+export async function getFileContents(file: File): Promise<string | Uint8Array> {
+    let content = file.content;
+    if(typeof content === 'function') {
+        content = await content();
+    }
+    return content;
+}
+
+export async function getContents(absolutePath: string, filesystem = root): Promise<string | Uint8Array> {
+    const file = await getFile(absolutePath, filesystem);
     let content = file.content;
     if(typeof content === 'function') {
         content = await content();

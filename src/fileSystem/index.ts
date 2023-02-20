@@ -26,6 +26,11 @@ export default {
                     type: 'text',
                     content: 'Welcome to my website! Feel free to poke around and see what you can find.'
                 },
+                {
+                    name: "resume.pdf",
+                    type: "link",
+                    content: "/resume.pdf"
+                }
             ],
             directories: []
         }]

@@ -1,6 +1,6 @@
 import type { Terminal } from 'xterm';
 import Programs, { ProgramInterface } from './programs';
-import introduction from "../static/introduction.txt?raw";
+import { message } from "../static/introduction.js";
 import c from 'ansi-colors';
 c.enabled = true;
 
@@ -20,8 +20,9 @@ export class TerminalManager {
     constructor(terminal: Terminal) {
         this._terminal = terminal;
         this.setupInputHandler();
-        this._terminal.writeln(introduction);
-        this._terminal.write(this.prompt());
+        this._terminal.writeln(message);
+        const prompt = this.prompt();
+        this._terminal.write(prompt);
         const historyString = window.localStorage.getItem("history");
         if (historyString !== null) {
             this.history = JSON.parse(historyString);
@@ -29,6 +30,7 @@ export class TerminalManager {
         } else {
             this.history = [];
         }
+        this._terminal.focus();
     }
 
     private replaceInput(text: string): void {
@@ -118,7 +120,7 @@ export class TerminalManager {
     public async exec(): Promise<void> {
         this._terminal.write("\r\n");
         this.addHistory(this.input);
-        this.historyPosition = 0;
+        this.historyPosition = this.history.length;
         this.tempHistory = "";
         const args = this.input.split(" ");
         const programName = args[0];

@@ -1,14 +1,27 @@
 import type { ProgramInterface } from "../interface";
 import { Program } from "../base";
-import { getContents, resolvePath } from "../../fileSystem/utils";
+import { getContents, getFile, getFileContents, resolvePath } from "../../fileSystem/utils";
 
 export default {
     run: async (programInterface: ProgramInterface): Promise<number> => {
-        programInterface.args.slice(1).forEach(async (arg) => {
-            arg = resolvePath( programInterface.env.PWD, arg, programInterface.env.HOME);
-            const contents = await getContents(arg);
-            await programInterface.writeln(contents.toString());
-        });
+        const args = programInterface.args.slice(1)
+        for (const arg of args){
+            let resolvedArg = resolvePath( programInterface.env.PWD, arg, programInterface.env.HOME);
+            const file = await getFile(resolvedArg);
+            const contents = await getFileContents(file);
+            switch (file.type) {
+                case "text":
+                    await programInterface.writeln(contents.toString());
+                    break;
+                case "link":
+                    const url = new URL(document.URL);
+                    url.pathname = contents.toString();
+                    await programInterface.writeln(url.toString());
+                    break;
+                default:
+                    await programInterface.writeln("cat: " + arg + ": Not a text file");
+            }
+        }
         return 0;
     },
     suggest: async (): Promise<string> => {
