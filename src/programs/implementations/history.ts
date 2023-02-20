@@ -12,6 +12,7 @@ export default {
     },
     suggest: async (): Promise<string> => {
         return "";
-    }
+    },
+    description: "Manage the history of the terminal."
 } as Program;
 

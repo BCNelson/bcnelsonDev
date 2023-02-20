@@ -8,6 +8,7 @@ export default {
     },
     suggest: async (): Promise<string> => {
         return ""; 
-    }
+    },
+    description: "Print the current working directory."
 } as Program;
 

@@ -22,6 +22,7 @@ export default {
     },
     suggest: async (): Promise<string> => {
         return ""; 
-    }
+    },
+    description: "List the contents of a directory."
 } as Program;
 

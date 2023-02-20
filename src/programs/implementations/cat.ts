@@ -13,6 +13,7 @@ export default {
     },
     suggest: async (): Promise<string> => {
         return ""; 
-    }
+    },
+    description: "Print the contents of a file to the terminal."
 } as Program;
 

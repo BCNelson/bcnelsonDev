@@ -8,6 +8,7 @@ import Cat from './implementations/cat';
 import Cd from './implementations/cd';
 import History from './implementations/history';
 import PWD from './implementations/pwd';
+import Help from './implementations/help';
 
 export default new Map<string, Program>(Object.entries({
     echo: Echo,
@@ -16,5 +17,6 @@ export default new Map<string, Program>(Object.entries({
     cat: Cat,
     cd: Cd,
     history: History,
-    pwd: PWD
+    pwd: PWD,
+    help: Help
 }));

@@ -8,6 +8,7 @@ export default {
     },
     suggest: async (): Promise<string> => {
         return "";
-    }
+    },
+    description: "Clear the terminal."
 } as Program;
 

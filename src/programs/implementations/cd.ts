@@ -24,6 +24,7 @@ export default {
     },
     suggest: async (): Promise<string> => {
         return ""; 
-    }
+    },
+    description: "Change the current working directory."
 } as Program;
 
