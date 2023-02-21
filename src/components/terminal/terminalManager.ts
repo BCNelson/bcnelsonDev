@@ -1,6 +1,6 @@
 import type { Terminal } from 'xterm';
 import Programs, { ProgramInterface } from './programs';
-import { message } from "../static/introduction.js";
+import { message } from "../../../static/introduction.js";
 import c from 'ansi-colors';
 c.enabled = true;
 

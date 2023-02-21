@@ -2,8 +2,9 @@
 module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts}",
+    "./src/**/*.{js,ts,Vue}",
   ],
+  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {},
   },
