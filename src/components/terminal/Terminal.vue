@@ -1,5 +1,5 @@
 <template>
-  <div ref="terminalContainer" class="ring ring-offset-8 ring-offset-black ring-blue-600 md:m-5 rounded-lg"></div>
+  <div ref="terminalContainer"></div>
 </template>
 
 <script setup lang="ts">
