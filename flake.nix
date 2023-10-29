@@ -23,6 +23,7 @@
                 nodejs
                 pnpm
                 just
+                python3 #for naive node builds
             ];
         };
       });

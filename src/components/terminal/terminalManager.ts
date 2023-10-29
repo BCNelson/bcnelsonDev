@@ -127,7 +127,7 @@ export class TerminalManager {
         const program = Programs.get(programName);
         if (program) {
             const programInterface = new ProgramInterface(this._terminal, args, this.env, this);
-            umami.trackEvent("programExec", { programName, args, env: this.env });
+            umami.track("programExec", { programName, args: JSON.stringify(args), env: JSON.stringify(this.env) });
             await program.run(programInterface)
         } else {
             this._terminal.writeln(programName + ": command not found");
