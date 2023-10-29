@@ -15,13 +15,13 @@ if (import.meta.env.PROD) {
 } else {
     console.log('dev mode');
     globalThis.umami = new Proxy({}, {
-        get: function (target, prop, receiver) {
+        get: function (_target, prop, _receiver) {
             if (prop !== "track") throw new Error("Property Not supported")
             return function () {
                 console.log(`umami`, prop, ...arguments);
             }
         },
-        set (target, prop, value) {
+        set (_target, prop, value) {
             console.log('umami', prop, value);
             return true;
         }
