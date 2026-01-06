@@ -15,7 +15,7 @@ const zoneId = config.requireSecret("cloudflareZoneId");
 // This resource manages the worker's existence and settings
 const workerScript = new cloudflare.WorkersScript("bcnelson-dev-worker", {
   accountId: accountId,
-  name: "bcnelson-dev",
+  scriptName: "bcnelson-dev",
   content: "export default { fetch() { return new Response('Deployed via Wrangler'); } }",
   module: true,
   compatibilityDate: "2025-01-01",
@@ -23,10 +23,10 @@ const workerScript = new cloudflare.WorkersScript("bcnelson-dev-worker", {
 });
 
 // Workers Custom Domain (routes traffic from domain to worker)
-const workerDomain = new cloudflare.WorkersDomain("bcnelson-dev-domain", {
+const workerDomain = new cloudflare.WorkerDomain("bcnelson-dev-domain", {
   accountId: accountId,
   hostname: domain,
-  service: workerScript.name,
+  service: workerScript.scriptName,
   zoneId: zoneId,
 });
 
@@ -70,7 +70,7 @@ const webAnalytics = new cloudflare.WebAnalyticsSite("bcnelson-dev-analytics", {
 });
 
 // Exports
-export const workerName = workerScript.name;
+export const workerName = workerScript.scriptName;
 export const workerUrl = pulumi.interpolate`https://${domain}`;
 export const workersDevUrl = pulumi.interpolate`https://bcnelson-dev.${accountId}.workers.dev`;
 export const webAnalyticsToken = webAnalytics.siteToken;
