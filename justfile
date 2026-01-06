@@ -7,6 +7,7 @@ default:
 # Install npm dependencies
 install:
     npm install
+    cd infrastructure && npm install
 
 # Start dev server (uses steam-run for NixOS workerd compatibility)
 dev:

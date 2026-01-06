@@ -1,8 +1,6 @@
 config:
-  bcnelson-dev-infra:cloudflareAccountId:
-    secure: AAABAIrZ3fPYqGXv+XahLBg382yemxuJYwoXfnzljGSxLdqBNoum9mufBYOUZ28KL3SUWJkvQqEcm17/ysw3VQ==
-  bcnelson-dev-infra:cloudflareZoneId:
-    secure: AAABAL3GP34xYwqSVyN9V0g4u7w5jA6V55AFXdWlE3sPW0S42D5GqVVowGrDbo3L+l9J5CtDPqSZRTClgp7HMw==
+  bcnelson-dev-infra:cloudflareAccountId: 6845b4667e7d57b1e4c52a8ab526e484
+  bcnelson-dev-infra:cloudflareZoneId: 2afab945023de6634b53f500f6a537fe
   bcnelson-dev-infra:domain: bcnelson.dev
   cloudflare:apiToken:
     secure: AAABAFsMeuJYpMjkh13i9IUtodeLFizsXF50QgUpSO9SZWkXfwzrrnr524aJb8VHjOKVZMkDGtG3LoHHcc/ohfYaMWnl8euv
