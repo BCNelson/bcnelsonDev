@@ -26,6 +26,10 @@ deploy: build
 
 # --- Pulumi Infrastructure ---
 
+# Type check infrastructure code
+infra-check:
+    cd infrastructure && npm run check
+
 # Preview infrastructure changes
 infra-preview:
     cd infrastructure && pulumi preview -s prod

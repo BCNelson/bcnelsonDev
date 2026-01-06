@@ -17,7 +17,7 @@ const workerScript = new cloudflare.WorkersScript("bcnelson-dev-worker", {
   accountId: accountId,
   scriptName: "bcnelson-dev",
   content: "export default { fetch() { return new Response('Deployed via Wrangler'); } }",
-  module: true,
+  mainModule: "index.js",
   compatibilityDate: "2025-01-01",
   compatibilityFlags: ["nodejs_compat"],
 });
