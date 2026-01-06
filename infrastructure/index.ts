@@ -23,15 +23,15 @@ const workerScript = new cloudflare.WorkersScript("bcnelson-dev-worker", {
 });
 
 // Workers Custom Domain (routes traffic from domain to worker)
-const workerDomain = new cloudflare.WorkerDomain("bcnelson-dev-domain", {
+const workerDomain = new cloudflare.WorkersCustomDomain("bcnelson-dev-domain", {
   accountId: accountId,
   hostname: domain,
   service: workerScript.scriptName,
   zoneId: zoneId,
 });
 
-// www redirect - CNAME to apex, handled by worker or page rule
-const wwwRecord = new cloudflare.Record("www-redirect", {
+// www CNAME pointing to apex (redirect handled by Cloudflare automatically when proxied)
+const wwwRecord = new cloudflare.DnsRecord("www-redirect", {
   zoneId: zoneId,
   name: "www",
   type: "CNAME",
@@ -40,33 +40,13 @@ const wwwRecord = new cloudflare.Record("www-redirect", {
   ttl: 1,
 });
 
-// Redirect www to apex domain
-const wwwRedirectRule = new cloudflare.Ruleset("www-redirect-rule", {
-  zoneId: zoneId,
-  name: "Redirect www to apex",
-  kind: "zone",
-  phase: "http_request_dynamic_redirect",
-  rules: [{
-    action: "redirect",
-    actionParameters: {
-      fromValue: {
-        statusCode: 301,
-        targetUrl: {
-          expression: `concat("https://${domain}", http.request.uri.path)`,
-        },
-      },
-    },
-    expression: `(http.host eq "www.${domain}")`,
-    description: "Redirect www to apex domain",
-    enabled: true,
-  }],
-});
-
 // Cloudflare Web Analytics
+// Note: autoInstall only works with Pages, not Workers
+// The analytics script must be added manually to the site
 const webAnalytics = new cloudflare.WebAnalyticsSite("bcnelson-dev-analytics", {
   accountId: accountId,
   host: domain,
-  autoInstall: true,
+  autoInstall: false,
 });
 
 // Exports
