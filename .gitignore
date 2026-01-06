@@ -24,3 +24,14 @@ dist-ssr
 *.sw?
 
 .direnv
+.devenv/
+
+# Astro
+.astro/
+
+# Wrangler
+.wrangler/
+.dev.vars
+
+# Pulumi
+infrastructure/bin/

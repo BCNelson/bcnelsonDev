@@ -1,0 +1,30 @@
+---
+import BaseHead from "../components/astro/BaseHead.astro";
+import Header from "../components/astro/Header.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Personal website for Bradley Nelson, a backend software engineer." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+  <body class="min-h-screen">
+    <Header />
+    <main class="container mx-auto px-4 py-8">
+      <slot />
+    </main>
+    <footer class="bg-gray-900 text-gray-400 py-4 mt-auto">
+      <div class="container mx-auto px-4 text-center">
+        <p>&copy; {new Date().getFullYear()} Bradley Nelson. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

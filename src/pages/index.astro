@@ -1,0 +1,15 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Profile from "../components/astro/Profile.astro";
+import Terminal from "../components/vue/terminal/Terminal.vue";
+---
+
+<BaseLayout title="Terminal - Bradley Nelson">
+  <div class="space-y-8">
+    <Terminal
+      client:only="vue"
+      class="ring ring-offset-8 ring-offset-black ring-blue-600 md:m-5 rounded-lg"
+    />
+    <Profile />
+  </div>
+</BaseLayout>

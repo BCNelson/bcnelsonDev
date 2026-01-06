@@ -1,0 +1,11 @@
+{
+  "name": "bcnelson-dev-infra",
+  "main": "index.ts",
+  "devDependencies": {
+    "@types/node": "^20"
+  },
+  "dependencies": {
+    "@pulumi/cloudflare": "^6.0.0",
+    "@pulumi/pulumi": "^3.0.0"
+  }
+}

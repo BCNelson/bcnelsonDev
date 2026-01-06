@@ -1,0 +1,47 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import type { CollectionEntry } from "astro:content";
+
+type Props = CollectionEntry<"blog">["data"];
+
+const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="max-w-3xl mx-auto">
+    <div class="mb-8">
+      {heroImage && (
+        <img
+          class="w-full rounded-lg shadow-lg mb-4"
+          src={heroImage}
+          alt={title}
+        />
+      )}
+      <h1 class="text-4xl font-bold text-white mb-2">{title}</h1>
+      <div class="text-gray-400">
+        <time datetime={pubDate.toISOString()}>
+          {pubDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </time>
+        {updatedDate && (
+          <span>
+            {" "}(Updated:{" "}
+            <time datetime={updatedDate.toISOString()}>
+              {updatedDate.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>)
+          </span>
+        )}
+      </div>
+    </div>
+    <div class="prose prose-lg prose-invert max-w-none">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
