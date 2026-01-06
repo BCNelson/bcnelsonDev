@@ -1,8 +1,12 @@
 {
   "name": "bcnelson-dev",
+  "main": "./dist/_worker.js",
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": "./dist",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
   "observability": {
     "enabled": true
   }

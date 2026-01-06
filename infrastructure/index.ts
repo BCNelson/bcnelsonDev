@@ -10,63 +10,27 @@ const zoneId = config.requireSecret("cloudflareZoneId");
 // Note: CLOUDFLARE_API_TOKEN is read automatically by the Cloudflare provider
 // Set it with: pulumi config set --secret cloudflare:apiToken <token>
 
-// Cloudflare Pages Project
-const pagesProject = new cloudflare.PagesProject("bcnelson-dev", {
+// Cloudflare Worker Script
+// Note: The actual script content is deployed via `wrangler deploy` in CI
+// This resource manages the worker's existence and settings
+const workerScript = new cloudflare.WorkersScript("bcnelson-dev-worker", {
   accountId: accountId,
   name: "bcnelson-dev",
-  productionBranch: "main",
-  buildConfig: {
-    buildCommand: "npm run build",
-    destinationDir: "dist",
-    rootDir: "/",
-  },
-  source: {
-    type: "github",
-    config: {
-      owner: "bcnelson",
-      repoName: "bcnelsonDev",
-      productionBranch: "main",
-      productionDeploymentsEnabled: true,
-      previewDeploymentsEnabled: true,
-      previewBranchIncludes: ["*"],
-      previewBranchExcludes: ["main"],
-    },
-  },
-  deploymentConfigs: {
-    production: {
-      compatibilityDate: "2025-01-01",
-      compatibilityFlags: ["nodejs_compat"],
-      failOpen: false,
-      environmentVariables: {
-        NODE_VERSION: "20",
-      },
-    },
-    preview: {
-      compatibilityDate: "2025-01-01",
-      compatibilityFlags: ["nodejs_compat"],
-      failOpen: true,
-    },
-  },
+  content: "export default { fetch() { return new Response('Deployed via Wrangler'); } }",
+  module: true,
+  compatibilityDate: "2025-01-01",
+  compatibilityFlags: ["nodejs_compat"],
 });
 
-// Custom domain for Pages
-const pagesDomain = new cloudflare.PagesDomain("bcnelson-dev-domain", {
+// Workers Custom Domain (routes traffic from domain to worker)
+const workerDomain = new cloudflare.WorkersDomain("bcnelson-dev-domain", {
   accountId: accountId,
-  projectName: pagesProject.name,
-  domain: domain,
-});
-
-// DNS CNAME record pointing to Pages
-const dnsRecord = new cloudflare.Record("bcnelson-dev-cname", {
+  hostname: domain,
+  service: workerScript.name,
   zoneId: zoneId,
-  name: domain,
-  type: "CNAME",
-  content: pulumi.interpolate`${pagesProject.name}.pages.dev`,
-  proxied: true,
-  ttl: 1, // Auto TTL when proxied
 });
 
-// www redirect CNAME
+// www redirect - CNAME to apex, handled by worker or page rule
 const wwwRecord = new cloudflare.Record("www-redirect", {
   zoneId: zoneId,
   name: "www",
@@ -76,15 +40,37 @@ const wwwRecord = new cloudflare.Record("www-redirect", {
   ttl: 1,
 });
 
+// Redirect www to apex domain
+const wwwRedirectRule = new cloudflare.Ruleset("www-redirect-rule", {
+  zoneId: zoneId,
+  name: "Redirect www to apex",
+  kind: "zone",
+  phase: "http_request_dynamic_redirect",
+  rules: [{
+    action: "redirect",
+    actionParameters: {
+      fromValue: {
+        statusCode: 301,
+        targetUrl: {
+          expression: `concat("https://${domain}", http.request.uri.path)`,
+        },
+      },
+    },
+    expression: `(http.host eq "www.${domain}")`,
+    description: "Redirect www to apex domain",
+    enabled: true,
+  }],
+});
+
 // Cloudflare Web Analytics
 const webAnalytics = new cloudflare.WebAnalyticsSite("bcnelson-dev-analytics", {
   accountId: accountId,
   host: domain,
-  autoInstall: true, // Cloudflare auto-injects the beacon script
+  autoInstall: true,
 });
 
 // Exports
-export const pagesProjectName = pagesProject.name;
-export const pagesUrl = pulumi.interpolate`https://${pagesDomain.domain}`;
-export const pagesDevUrl = pulumi.interpolate`https://${pagesProject.name}.pages.dev`;
+export const workerName = workerScript.name;
+export const workerUrl = pulumi.interpolate`https://${domain}`;
+export const workersDevUrl = pulumi.interpolate`https://bcnelson-dev.${accountId}.workers.dev`;
 export const webAnalyticsToken = webAnalytics.siteToken;

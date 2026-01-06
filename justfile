@@ -20,9 +20,9 @@ build:
 preview:
     steam-run npm run preview
 
-# Deploy to Cloudflare Pages (requires CLOUDFLARE_API_TOKEN)
+# Deploy to Cloudflare Workers (requires CLOUDFLARE_API_TOKEN)
 deploy: build
-    npx wrangler pages deploy dist --project-name=bcnelson-dev
+    npx wrangler deploy
 
 # --- Pulumi Infrastructure ---
 
