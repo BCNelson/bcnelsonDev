@@ -1,4 +1,4 @@
-import type { Terminal } from 'xterm';
+import type { Terminal } from '@xterm/xterm';
 import Root from '../fileSystem';
 import type { TerminalManager } from '../terminalManager';
 
@@ -45,4 +45,19 @@ export class ProgramInterface {
     }
 }
 
-export interface Context {}
+export interface Context {
+  /** Full current input string */
+  input: string;
+  /** Cursor position in input */
+  cursorPosition: number;
+  /** Tokenized input */
+  tokens: string[];
+  /** Index of token cursor is in (0 = command) */
+  tokenIndex: number;
+  /** The partial token being completed */
+  partial: string;
+  /** Environment variables */
+  env: Record<string, string>;
+  /** Available program names */
+  programs: string[];
+}

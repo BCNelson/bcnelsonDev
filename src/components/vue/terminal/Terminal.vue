@@ -6,10 +6,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from "vue";
-import { Terminal } from "xterm";
+import { Terminal } from "@xterm/xterm";
 import { TerminalManager } from "./terminalManager.js";
-import { FitAddon } from "xterm-addon-fit";
-import { WebLinksAddon } from "xterm-addon-web-links";
+import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from "@xterm/addon-web-links";
 
 const terminalWrapper = ref<HTMLElement>();
 const terminalContainer = ref<HTMLElement>();
@@ -68,6 +68,16 @@ onMounted(async () => {
 
   terminal.loadAddon(fitAddon);
   terminal.loadAddon(new WebLinksAddon());
+
+  // Intercept Tab key to prevent browser focus navigation
+  terminal.attachCustomKeyEventHandler((event) => {
+    if (event.key === "Tab") {
+      // Return true to let xterm handle the Tab key
+      // This prevents the browser from using it for focus navigation
+      return true;
+    }
+    return true;
+  });
 
   if (terminalContainer.value) {
     terminal.open(terminalContainer.value);

@@ -20,7 +20,7 @@ export default defineConfig({
   vite: {
     ssr: {
       // xterm.js requires DOM and cannot be server-rendered
-      external: ["xterm", "xterm-addon-fit", "xterm-addon-web-links"],
+      external: ["@xterm/xterm", "@xterm/addon-fit", "@xterm/addon-web-links"],
     },
   },
 });
