@@ -1,0 +1,81 @@
+---
+import SectionLabel from "../ui/SectionLabel.astro";
+import ProjectCard from "../projects/ProjectCard.astro";
+import { projects, categories } from "../../../data/projects";
+
+// Get first 3 projects for featured section
+const featuredProjects = projects.slice(0, 3);
+---
+
+<section id="projects" class="py-20 lg:py-24 section-gradient-1">
+  <div class="container mx-auto px-4 lg:px-8">
+    <!-- Section Header -->
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+      <div>
+        <SectionLabel class="mb-2" variant="purple">SYSTEM_MODULES</SectionLabel>
+        <h2 class="text-3xl md:text-4xl font-bold">Project Portfolio</h2>
+      </div>
+
+      <!-- Filter Tabs (visual only for now) -->
+      <div class="flex flex-wrap gap-2">
+        {
+          categories.slice(0, 4).map((cat, index) => (
+            <button
+              class={`px-4 py-1.5 rounded-full font-mono text-sm transition-all duration-300 ${
+                index === 0
+                  ? "bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+                  : "border border-slate-700 text-slate-400 hover:border-purple-500/50 hover:text-purple-400"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Projects Grid -->
+    {
+      featuredProjects.length > 0 ? (
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredProjects.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12 border border-dashed border-border rounded-lg">
+          <p class="text-slate-500 font-mono">
+            No projects yet. Add some to src/data/projects.ts
+          </p>
+        </div>
+      )
+    }
+
+    <!-- View All Link -->
+    {
+      projects.length > 3 && (
+        <div class="mt-8 text-center">
+          <a
+            href="/projects"
+            class="inline-flex items-center gap-2 font-mono text-sm text-slate-400 hover:text-accent-cyan transition-colors"
+          >
+            View all projects
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </a>
+        </div>
+      )
+    }
+  </div>
+</section>

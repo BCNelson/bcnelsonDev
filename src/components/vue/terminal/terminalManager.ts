@@ -141,7 +141,7 @@ export class TerminalManager {
         if (path.startsWith(this.env.HOME)) {
             path = "~" + path.slice(this.env.HOME.length);
         }
-        return `${c.green('visitor')}@bcnelson.dev ${c.greenBright(path)}> `
+        return `${c.cyan('guest')}${c.gray('@')}${c.cyanBright('bcnelson.dev')}${c.gray(':')}${c.magenta(path)}${c.gray('$')} `
     }
 
     private addHistory(input: string): void {

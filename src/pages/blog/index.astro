@@ -1,38 +1,97 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectionLabel from "../../components/astro/ui/SectionLabel.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 ---
 
-<BaseLayout title="Blog - Bradley Nelson" description="Blog posts by Bradley Nelson">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold text-white mb-8">Blog</h1>
-    {posts.length === 0 ? (
-      <p class="text-gray-400">No blog posts yet. Check back soon!</p>
-    ) : (
-      <ul class="space-y-6">
-        {posts.map((post) => (
-          <li>
-            <a
-              href={`/blog/${post.slug}`}
-              class="block p-6 bg-gray-800 rounded-lg shadow hover:shadow-lg hover:bg-gray-700 transition"
-            >
-              <h2 class="text-xl font-semibold text-white">{post.data.title}</h2>
-              <time class="text-gray-500 text-sm" datetime={post.data.pubDate.toISOString()}>
-                {post.data.pubDate.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-              <p class="mt-2 text-gray-400">{post.data.description}</p>
-            </a>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
+<BaseLayout
+  title="Blog - Bradley Nelson"
+  description="Thoughts on backend development, infrastructure, and software engineering"
+>
+  <section class="py-12 lg:py-20">
+    <div class="container mx-auto px-4 lg:px-8 max-w-4xl">
+      <!-- Page Header -->
+      <div class="mb-12">
+        <SectionLabel class="mb-2">LOGS</SectionLabel>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
+        <p class="text-slate-400">
+          Thoughts on backend development, infrastructure, and software
+          engineering.
+        </p>
+      </div>
+
+      <!-- Posts List -->
+      {
+        posts.length === 0 ? (
+          <div class="text-center py-20 border border-dashed border-border rounded-lg">
+            <p class="text-slate-500 font-mono text-lg mb-2">No posts yet</p>
+            <p class="text-slate-600 text-sm">Check back soon!</p>
+          </div>
+        ) : (
+          <div class="space-y-4">
+            {posts.map((post) => (
+              <a
+                href={`/blog/${post.slug}`}
+                class="block group bg-surface-secondary/50 border border-border rounded-lg p-6 transition-all duration-300 hover:border-border-accent hover:bg-surface-secondary hover:shadow-glow-sm"
+              >
+                <div class="flex flex-col gap-3">
+                  {/* Meta */}
+                  <div class="flex items-center gap-4 text-sm font-mono">
+                    <time
+                      class="text-slate-500"
+                      datetime={post.data.pubDate.toISOString()}
+                    >
+                      {formatDate(post.data.pubDate)}
+                    </time>
+                  </div>
+
+                  {/* Title */}
+                  <h2 class="text-xl font-semibold text-slate-100 group-hover:text-accent-cyan transition-colors">
+                    {post.data.title}
+                  </h2>
+
+                  {/* Description */}
+                  {post.data.description && (
+                    <p class="text-slate-400 line-clamp-2">
+                      {post.data.description}
+                    </p>
+                  )}
+
+                  {/* Read more */}
+                  <span class="inline-flex items-center gap-2 text-sm text-slate-500 group-hover:text-accent-cyan transition-colors">
+                    Read more
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </section>
 </BaseLayout>

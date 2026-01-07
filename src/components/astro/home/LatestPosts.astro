@@ -1,0 +1,101 @@
+---
+import SectionLabel from "../ui/SectionLabel.astro";
+import { getCollection } from "astro:content";
+
+// Get the 3 most recent blog posts
+const posts = (await getCollection("blog"))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+---
+
+<section class="py-20 lg:py-24 section-gradient-2">
+  <div class="container mx-auto px-4 lg:px-8">
+    <!-- Section Header -->
+    <div class="mb-12">
+      <SectionLabel class="mb-2" variant="gradient">LOGS</SectionLabel>
+      <h2 class="text-3xl md:text-4xl font-bold">Recent Entries</h2>
+    </div>
+
+    <!-- Posts List -->
+    {
+      posts.length > 0 ? (
+        <div class="space-y-4">
+          {posts.map((post) => (
+            <a
+              href={`/blog/${post.slug}`}
+              class="block group bg-surface-secondary/50 border border-border rounded-lg p-5 transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] hover:bg-surface-secondary"
+            >
+              <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+                {/* Date */}
+                <span class="font-mono text-sm text-slate-500 md:w-32 shrink-0">
+                  {formatDate(post.data.pubDate)}
+                </span>
+
+                {/* Title & Description */}
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-slate-100 group-hover:text-accent-cyan transition-colors truncate">
+                    {post.data.title}
+                  </h3>
+                  {post.data.description && (
+                    <p class="text-slate-400 text-sm mt-1 line-clamp-1">
+                      {post.data.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Arrow */}
+                <svg
+                  class="w-5 h-5 text-slate-500 group-hover:text-accent-cyan transition-colors shrink-0 hidden md:block"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12 border border-dashed border-border rounded-lg">
+          <p class="text-slate-500 font-mono">No blog posts yet.</p>
+        </div>
+      )
+    }
+
+    <!-- View All Link -->
+    <div class="mt-8 text-center">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 font-mono text-sm text-slate-400 hover:text-accent-cyan transition-colors"
+      >
+        View all posts
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  class?: string;
+  variant?: "cyan" | "purple" | "gradient";
+}
+
+const { class: className = "", variant = "cyan" } = Astro.props;
+
+const variantClasses = {
+  cyan: "text-accent-cyan",
+  purple: "text-purple-400",
+  gradient: "text-gradient-purple",
+};
+---
+
+<span
+  class={`inline-block font-mono text-sm tracking-wider uppercase ${variantClasses[variant]} ${className}`}
+>
+  <slot />
+</span>

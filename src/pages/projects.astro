@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SectionLabel from "../components/astro/ui/SectionLabel.astro";
+import ProjectCard from "../components/astro/projects/ProjectCard.astro";
+import { projects, categories } from "../data/projects";
+---
+
+<BaseLayout
+  title="Projects - Bradley Nelson"
+  description="A collection of projects and experiments by Bradley Nelson"
+>
+  <section class="py-12 lg:py-20">
+    <div class="container mx-auto px-4 lg:px-8">
+      <!-- Page Header -->
+      <div class="mb-12">
+        <SectionLabel class="mb-2">SYSTEM_MODULES</SectionLabel>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
+        <p class="text-slate-400 max-w-2xl">
+          A collection of projects, experiments, and tools I've built. From
+          infrastructure automation to full-stack applications.
+        </p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap gap-2 mb-8">
+        {
+          categories.map((cat, index) => (
+            <button
+              class={`px-4 py-1.5 rounded-full font-mono text-sm transition-colors ${
+                index === 0
+                  ? "bg-accent-cyan text-surface-primary"
+                  : "border border-slate-700 text-slate-400 hover:border-accent-cyan hover:text-accent-cyan"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- Projects Grid -->
+      {
+        projects.length > 0 ? (
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <ProjectCard project={project} />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-20 border border-dashed border-border rounded-lg">
+            <p class="text-slate-500 font-mono text-lg mb-2">
+              No projects yet
+            </p>
+            <p class="text-slate-600 text-sm">
+              Add projects to src/data/projects.ts
+            </p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,50 @@
+---
+const currentYear = new Date().getFullYear();
+
+const footerLinks = [
+  { label: "GitHub", href: "https://github.com/bcnelson" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/bcnelson" },
+  { label: "RSS", href: "/rss.xml" },
+];
+---
+
+<footer class="bg-surface-primary border-t border-border py-6">
+  <div class="container mx-auto px-4 lg:px-8">
+    <div
+      class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm"
+    >
+      <!-- Logo -->
+      <a
+        href="/"
+        class="flex items-center gap-2 font-mono text-slate-400 hover:text-slate-100 transition-colors"
+      >
+        <span class="text-accent-cyan">{">"}</span>
+        <span>BCNELSON.DEV</span>
+      </a>
+
+      <!-- Center Text -->
+      <div class="text-center font-mono text-slate-600 text-xs">
+        <p class="uppercase tracking-wider">
+          Designed for Performance & Reliability
+        </p>
+        <p>&copy; {currentYear} All Systems Functional</p>
+      </div>
+
+      <!-- Links -->
+      <nav class="flex items-center gap-6">
+        {
+          footerLinks.map((link) => (
+            <a
+              href={link.href}
+              target={link.href.startsWith("http") ? "_blank" : undefined}
+              rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              class="text-slate-500 hover:text-slate-100 transition-colors"
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+  </div>
+</footer>
