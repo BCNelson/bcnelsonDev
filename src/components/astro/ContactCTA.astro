@@ -1,4 +1,10 @@
 ---
+interface Props {
+  turnstileSiteKey: string;
+}
+
+const { turnstileSiteKey } = Astro.props;
+
 const socialLinks = [
   {
     name: "Email",
@@ -52,7 +58,7 @@ const socialLinks = [
 
       <!-- Right side - Contact Form -->
       <div class="bg-surface-primary rounded-2xl p-6 lg:p-8 shadow-2xl border border-slate-800">
-        <form class="space-y-5">
+        <form id="contact-form" class="space-y-5">
           <div class="grid md:grid-cols-2 gap-5">
             <!-- Name Field -->
             <div>
@@ -66,6 +72,8 @@ const socialLinks = [
                 type="text"
                 id="name"
                 name="name"
+                required
+                minlength="2"
                 placeholder="Identify yourself"
                 class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-none"
               />
@@ -83,6 +91,7 @@ const socialLinks = [
                 type="email"
                 id="email"
                 name="email"
+                required
                 placeholder="name@domain.com"
                 class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-none"
               />
@@ -101,20 +110,115 @@ const socialLinks = [
               id="message"
               name="message"
               rows="4"
+              required
+              minlength="10"
               placeholder="What's the handshake about?"
               class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-none resize-none"
             ></textarea>
           </div>
 
+          <!-- Turnstile Widget -->
+          <div
+            class="cf-turnstile"
+            data-sitekey={turnstileSiteKey}
+            data-theme="dark"
+          >
+          </div>
+
+          <!-- Status Message -->
+          <div id="form-status" class="hidden text-sm font-mono p-3 rounded"></div>
+
           <!-- Submit Button -->
           <button
             type="submit"
-            class="w-full bg-accent-cyan text-surface-primary font-mono font-semibold py-4 rounded-lg hover:bg-accent-cyan-bright hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all uppercase tracking-wider"
+            id="submit-btn"
+            class="w-full bg-accent-cyan text-surface-primary font-mono font-semibold py-4 rounded-lg hover:bg-accent-cyan-bright hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            TRANSMIT_DATA
+            <span id="btn-text">TRANSMIT_DATA</span>
+            <span id="btn-loading" class="hidden">TRANSMITTING...</span>
           </button>
         </form>
       </div>
     </div>
   </div>
 </section>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+  declare global {
+    interface Window {
+      turnstile: {
+        getResponse: (container?: string | HTMLElement) => string | undefined;
+        reset: (container?: string | HTMLElement) => void;
+      };
+    }
+  }
+
+  const form = document.getElementById("contact-form") as HTMLFormElement;
+  const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
+  const btnText = document.getElementById("btn-text") as HTMLSpanElement;
+  const btnLoading = document.getElementById("btn-loading") as HTMLSpanElement;
+  const formStatus = document.getElementById("form-status") as HTMLDivElement;
+
+  function showStatus(message: string, isError: boolean) {
+    formStatus.textContent = message;
+    formStatus.className = `text-sm font-mono p-3 rounded ${
+      isError
+        ? "bg-red-500/20 text-red-400 border border-red-500/30"
+        : "bg-green-500/20 text-green-400 border border-green-500/30"
+    }`;
+    formStatus.classList.remove("hidden");
+  }
+
+  function setLoading(loading: boolean) {
+    submitBtn.disabled = loading;
+    btnText.classList.toggle("hidden", loading);
+    btnLoading.classList.toggle("hidden", !loading);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const turnstileToken = window.turnstile?.getResponse();
+    if (!turnstileToken) {
+      showStatus("Please complete the verification challenge.", true);
+      return;
+    }
+
+    setLoading(true);
+    formStatus.classList.add("hidden");
+
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      message: formData.get("message"),
+      turnstileToken,
+    };
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showStatus("MESSAGE_TRANSMITTED_SUCCESSFULLY", false);
+        form.reset();
+        window.turnstile?.reset();
+      } else {
+        showStatus(result.error || "TRANSMISSION_FAILED", true);
+      }
+    } catch {
+      showStatus("NETWORK_ERROR_RETRY_LATER", true);
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>

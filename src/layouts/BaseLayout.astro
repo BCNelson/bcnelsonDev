@@ -17,6 +17,9 @@ const {
   description = "Personal website for Bradley Nelson, a backend software engineer.",
   showCTA = true,
 } = Astro.props;
+
+// Get Turnstile site key from Cloudflare Worker environment
+const turnstileSiteKey = Astro.locals.runtime?.env?.TURNSTILE_SITE_KEY ?? "";
 ---
 
 <!doctype html>
@@ -30,7 +33,7 @@ const {
     <main class="flex-1 pt-16">
       <slot />
     </main>
-    {showCTA && <ContactCTA />}
+    {showCTA && <ContactCTA turnstileSiteKey={turnstileSiteKey} />}
     <Footer />
   </body>
 </html>
