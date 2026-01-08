@@ -41,35 +41,43 @@ const contactEmailDestination = new cloudflare.EmailRoutingAddress(
 );
 
 // Cloudflare Worker Script
-// Note: The actual script content is deployed via `wrangler deploy` in CI
-// This resource manages the worker's existence, settings, and secret bindings
-const workerScript = new cloudflare.WorkersScript("bcnelson-dev-worker", {
-  accountId: accountId,
-  scriptName: "bcnelson-dev",
-  content: "export default { fetch() { return new Response('Deployed via Wrangler'); } }",
-  mainModule: "index.js",
-  compatibilityDate: "2025-01-01",
-  compatibilityFlags: ["nodejs_compat"],
-  bindings: [
-    {
-      name: "TURNSTILE_SECRET_KEY",
-      type: "secret_text",
-      text: turnstileWidget.secret,
-    },
-    {
-      name: "TURNSTILE_SITE_KEY",
-      type: "plain_text",
-      text: turnstileWidget.sitekey,
-    },
-    {
-      name: "CONTACT_EMAIL",
-      type: "send_email",
-      destinationAddress: contactEmail,
-    },
-  ],
-  // Keep bindings when wrangler deploys new code
-  keepBindings: ["secret_text", "plain_text", "send_email"],
-});
+// Note: The actual script content is deployed via `wrangler deploy`
+// This resource manages bindings only - content is ignored to prevent overwriting wrangler deploys
+const workerScript = new cloudflare.WorkersScript(
+  "bcnelson-dev-worker",
+  {
+    accountId: accountId,
+    scriptName: "bcnelson-dev",
+    content:
+      "export default { fetch() { return new Response('Deployed via Wrangler'); } }",
+    mainModule: "index.js",
+    compatibilityDate: "2025-01-01",
+    compatibilityFlags: ["nodejs_compat"],
+    bindings: [
+      {
+        name: "TURNSTILE_SECRET_KEY",
+        type: "secret_text",
+        text: turnstileWidget.secret,
+      },
+      {
+        name: "TURNSTILE_SITE_KEY",
+        type: "plain_text",
+        text: turnstileWidget.sitekey,
+      },
+      {
+        name: "CONTACT_EMAIL",
+        type: "send_email",
+        destinationAddress: contactEmail,
+      },
+    ],
+    // Keep bindings when wrangler deploys new code
+    keepBindings: ["secret_text", "plain_text", "send_email"],
+  },
+  {
+    // Don't overwrite the actual site content deployed by wrangler
+    ignoreChanges: ["content"],
+  }
+);
 
 // Workers Custom Domain (routes traffic from domain to worker)
 const workerDomain = new cloudflare.WorkersCustomDomain("bcnelson-dev-domain", {
