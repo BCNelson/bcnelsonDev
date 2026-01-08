@@ -4,3 +4,4 @@ config:
   bcnelson-dev-infra:domain: bcnelson.dev
   cloudflare:apiToken:
     secure: AAABAFsMeuJYpMjkh13i9IUtodeLFizsXF50QgUpSO9SZWkXfwzrrnr524aJb8VHjOKVZMkDGtG3LoHHcc/ohfYaMWnl8euv
+  bcnelson-dev-infra:contactEmail: bradley@nel.family
