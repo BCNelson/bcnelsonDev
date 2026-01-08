@@ -1,10 +1,4 @@
 ---
-interface Props {
-  turnstileSiteKey: string;
-}
-
-const { turnstileSiteKey } = Astro.props;
-
 const socialLinks = [
   {
     name: "Email",
@@ -117,13 +111,8 @@ const socialLinks = [
             ></textarea>
           </div>
 
-          <!-- Turnstile Widget -->
-          <div
-            class="cf-turnstile"
-            data-sitekey={turnstileSiteKey}
-            data-theme="dark"
-          >
-          </div>
+          <!-- Turnstile Widget (rendered dynamically after fetching sitekey) -->
+          <div id="turnstile-container"></div>
 
           <!-- Status Message -->
           <div id="form-status" class="hidden text-sm font-mono p-3 rounded"></div>
@@ -143,82 +132,114 @@ const socialLinks = [
   </div>
 </section>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 <script>
-  declare global {
-    interface Window {
-      turnstile: {
-        getResponse: (container?: string | HTMLElement) => string | undefined;
-        reset: (container?: string | HTMLElement) => void;
-      };
-    }
-  }
+  document.addEventListener("DOMContentLoaded", async () => {
+    const form = document.getElementById("contact-form") as HTMLFormElement;
+    const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
+    const btnText = document.getElementById("btn-text") as HTMLSpanElement;
+    const btnLoading = document.getElementById("btn-loading") as HTMLSpanElement;
+    const formStatus = document.getElementById("form-status") as HTMLDivElement;
+    const turnstileContainer = document.getElementById("turnstile-container");
 
-  const form = document.getElementById("contact-form") as HTMLFormElement;
-  const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
-  const btnText = document.getElementById("btn-text") as HTMLSpanElement;
-  const btnLoading = document.getElementById("btn-loading") as HTMLSpanElement;
-  const formStatus = document.getElementById("form-status") as HTMLDivElement;
-
-  function showStatus(message: string, isError: boolean) {
-    formStatus.textContent = message;
-    formStatus.className = `text-sm font-mono p-3 rounded ${
-      isError
-        ? "bg-red-500/20 text-red-400 border border-red-500/30"
-        : "bg-green-500/20 text-green-400 border border-green-500/30"
-    }`;
-    formStatus.classList.remove("hidden");
-  }
-
-  function setLoading(loading: boolean) {
-    submitBtn.disabled = loading;
-    btnText.classList.toggle("hidden", loading);
-    btnLoading.classList.toggle("hidden", !loading);
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const turnstileToken = window.turnstile?.getResponse();
-    if (!turnstileToken) {
-      showStatus("Please complete the verification challenge.", true);
+    if (!form || !submitBtn || !btnText || !btnLoading || !formStatus || !turnstileContainer) {
+      console.error("Contact form elements not found");
       return;
     }
 
-    setLoading(true);
-    formStatus.classList.add("hidden");
-
-    const formData = new FormData(form);
-    const data = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      message: formData.get("message"),
-      turnstileToken,
-    };
-
+    // Fetch sitekey from API and render Turnstile
+    let turnstileWidgetId: string | null = null;
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch("/api/turnstile-key");
+      const { siteKey } = await response.json();
 
-      const result = await response.json();
+      if (siteKey) {
+        // Wait for Turnstile script to load
+        const waitForTurnstile = () => new Promise<void>((resolve) => {
+          const check = () => {
+            if ((window as any).turnstile) {
+              resolve();
+            } else {
+              setTimeout(check, 100);
+            }
+          };
+          check();
+        });
 
-      if (result.success) {
-        showStatus("MESSAGE_TRANSMITTED_SUCCESSFULLY", false);
-        form.reset();
-        window.turnstile?.reset();
+        await waitForTurnstile();
+
+        turnstileWidgetId = (window as any).turnstile.render(turnstileContainer, {
+          sitekey: siteKey,
+          theme: "dark",
+        });
       } else {
-        showStatus(result.error || "TRANSMISSION_FAILED", true);
+        console.error("No Turnstile sitekey available");
       }
-    } catch {
-      showStatus("NETWORK_ERROR_RETRY_LATER", true);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error("Failed to load Turnstile:", err);
     }
+
+    function showStatus(message: string, isError: boolean) {
+      formStatus.textContent = message;
+      formStatus.className = `text-sm font-mono p-3 rounded ${
+        isError
+          ? "bg-red-500/20 text-red-400 border border-red-500/30"
+          : "bg-green-500/20 text-green-400 border border-green-500/30"
+      }`;
+      formStatus.classList.remove("hidden");
+    }
+
+    function setLoading(loading: boolean) {
+      submitBtn.disabled = loading;
+      btnText.classList.toggle("hidden", loading);
+      btnLoading.classList.toggle("hidden", !loading);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const turnstile = (window as any).turnstile;
+      const turnstileToken = turnstile?.getResponse(turnstileWidgetId);
+      if (!turnstileToken) {
+        showStatus("Please complete the verification challenge.", true);
+        return;
+      }
+
+      setLoading(true);
+      formStatus.classList.add("hidden");
+
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get("name"),
+        email: formData.get("email"),
+        message: formData.get("message"),
+        turnstileToken,
+      };
+
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showStatus("MESSAGE_TRANSMITTED_SUCCESSFULLY", false);
+          form.reset();
+          turnstile?.reset(turnstileWidgetId);
+        } else {
+          showStatus(result.error || "TRANSMISSION_FAILED", true);
+        }
+      } catch {
+        showStatus("NETWORK_ERROR_RETRY_LATER", true);
+      } finally {
+        setLoading(false);
+      }
+    });
   });
 </script>
