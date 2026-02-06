@@ -3,6 +3,8 @@ import Programs, { ProgramInterface } from './programs';
 import { message } from "../../../data/introduction.js";
 import { tokenize, findTokenAtCursor } from './parser';
 import { getDirectory, resolvePath } from './fileSystem/utils';
+import { VoiceService } from './voice/VoiceService';
+import type { VoiceEvent } from './voice/types';
 import c from 'ansi-colors';
 c.enabled = true;
 
@@ -18,6 +20,7 @@ export class TerminalManager {
     private history: string[];
     private historyPosition: number | null = null;
     private tempHistory = "";
+    private voiceService: VoiceService;
 
     constructor(terminal: Terminal) {
         this._terminal = terminal;
@@ -33,6 +36,61 @@ export class TerminalManager {
             this.history = [];
         }
         this._terminal.focus();
+
+        // Initialize voice service and subscribe to events
+        this.voiceService = VoiceService.getInstance();
+        this.voiceService.subscribe(this.handleVoiceEvent.bind(this));
+        this.voiceService.initialize().catch(() => {
+            // Silently fail - voice will initialize on first use
+        });
+    }
+
+    private handleVoiceEvent(event: VoiceEvent): void {
+        switch (event.type) {
+            case 'incoming-call':
+                this.showNotification(
+                    `\r\n${c.cyan('📞 Incoming call from:')} ${c.bold(event.data?.peerId ?? 'unknown')}\r\n` +
+                    `${c.gray('Run')} ${c.green('voice answer')} ${c.gray('to accept or')} ${c.red('voice reject')} ${c.gray('to decline.')}\r\n`
+                );
+                break;
+            case 'call-connected':
+                this.showNotification(
+                    `${c.green('✓')} ${c.green('Call connected with')} ${c.cyan(event.data?.peerId ?? 'peer')}\r\n`
+                );
+                break;
+            case 'call-ended':
+                this.showNotification(
+                    `${c.yellow('Call ended.')}\r\n`
+                );
+                break;
+            case 'error':
+                if (event.data?.error) {
+                    this.showNotification(
+                        `${c.red('Voice error:')} ${event.data.error}\r\n`
+                    );
+                }
+                break;
+        }
+    }
+
+    private showNotification(message: string): void {
+        // Save current line state
+        const savedInput = this.input;
+        const savedPosition = this.position;
+
+        // Move to new line and show notification
+        this._terminal.write('\r\n');
+        this._terminal.write(message);
+
+        // Restore prompt and input
+        this._terminal.write(this.prompt());
+        this._terminal.write(savedInput);
+
+        // Restore cursor position if needed
+        if (savedPosition < savedInput.length) {
+            const moveBack = savedInput.length - savedPosition;
+            this._terminal.write(`\x1b[${moveBack}D`);
+        }
     }
 
     private replaceInput(text: string): void {

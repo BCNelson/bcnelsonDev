@@ -9,6 +9,7 @@ import Cd from './implementations/cd';
 import History from './implementations/history';
 import PWD from './implementations/pwd';
 import Help from './implementations/help';
+import Voice from './implementations/voice';
 
 export default new Map<string, Program>(Object.entries({
     echo: Echo,
@@ -18,5 +19,6 @@ export default new Map<string, Program>(Object.entries({
     cd: Cd,
     history: History,
     pwd: PWD,
-    help: Help
+    help: Help,
+    voice: Voice
 }));

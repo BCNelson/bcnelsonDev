@@ -1,6 +1,7 @@
 import type { Terminal } from '@xterm/xterm';
 import Root from '../fileSystem';
 import type { TerminalManager } from '../terminalManager';
+import { VoiceService } from '../voice/VoiceService';
 
 export class ProgramInterface {
     private _terminal: Terminal;
@@ -30,6 +31,10 @@ export class ProgramInterface {
 
     get terminalManager(): TerminalManager {
         return this._terminalManager;
+    }
+
+    get voiceService(): VoiceService {
+        return VoiceService.getInstance();
     }
 
     async write(text: string): Promise<void> {
