@@ -50,8 +50,8 @@ async function handleId(pi: ProgramInterface, showQR: boolean): Promise<number> 
         await pi.writeln('Scan this QR code to call:');
         await pi.writeln('');
 
-        // Generate QR code using terminal-friendly output
-        const qrString = encodeQR(callUrl, 'term', { ecc: 'medium' });
+        // Generate QR code - use ascii mode (more compact) with minimal border
+        const qrString = encodeQR(callUrl, 'ascii', { ecc: 'low', border: 1 });
         // Split by newlines and output each line
         const lines = qrString.split('\n');
         for (const line of lines) {
