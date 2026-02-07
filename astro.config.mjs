@@ -16,6 +16,10 @@ export default defineConfig({
   ],
   adapter: cloudflare({
     platformProxy: { enabled: true },
+    workerEntryPoint: {
+      path: "src/worker.ts",
+      namedExports: ["PeerServer"],
+    },
   }),
   vite: {
     ssr: {

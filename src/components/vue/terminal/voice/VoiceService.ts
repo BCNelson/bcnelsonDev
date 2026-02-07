@@ -8,6 +8,9 @@ import type {
 } from './types';
 import { ERROR_MESSAGES } from './constants';
 import { playConnectSound, playDisconnectSound, preloadSounds } from './sounds';
+import { generateShortId } from './crockford';
+
+const PEER_ID_KEY = 'voice_peer_id';
 
 export class VoiceService {
     private static instance: VoiceService | null = null;
@@ -72,8 +75,20 @@ export class VoiceService {
 
         this.setStatus('connecting');
 
+        // Get or generate persistent peer ID
+        let peerId = localStorage.getItem(PEER_ID_KEY);
+        if (!peerId) {
+            peerId = generateShortId(40); // 8 characters
+            localStorage.setItem(PEER_ID_KEY, peerId);
+        }
+
         return new Promise((resolve, reject) => {
-            this.peer = new Peer();
+            this.peer = new Peer(peerId, {
+                host: 'bcnelson.dev',
+                port: 443,
+                path: '/peer',
+                secure: true,
+            });
 
             this.peer.on('open', (id) => {
                 this.state.peerId = id;

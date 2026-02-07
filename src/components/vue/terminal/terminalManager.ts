@@ -43,6 +43,49 @@ export class TerminalManager {
         this.voiceService.initialize().catch(() => {
             // Silently fail - voice will initialize on first use
         });
+
+        // Check for auto-call URL parameter
+        this.handleAutoCall();
+    }
+
+    private async handleAutoCall(): Promise<void> {
+        const url = new URL(window.location.href);
+        const callPeerId = url.searchParams.get('call');
+
+        if (!callPeerId) {
+            return;
+        }
+
+        // Validate peer ID format (alphanumeric and hyphens only)
+        if (!/^[a-zA-Z0-9-]+$/.test(callPeerId)) {
+            this._terminal.writeln(c.red('\r\nError: Invalid peer ID in URL.\r\n'));
+            return;
+        }
+
+        // Clear the URL parameter to prevent re-call on refresh
+        url.searchParams.delete('call');
+        window.history.replaceState({}, '', url.toString());
+
+        // Show message and initiate call after a brief delay
+        this._terminal.writeln(c.cyan('\r\nInitiating call from QR code link...\r\n'));
+
+        // Wait for voice service to initialize
+        try {
+            await this.voiceService.initialize();
+        } catch (e) {
+            this._terminal.writeln(c.red(`Error connecting to voice service: ${e instanceof Error ? e.message : 'Unknown error'}\r\n`));
+            return;
+        }
+
+        // Execute the call command
+        this.input = `voice call ${callPeerId}`;
+        this.position = this.input.length;
+        this._terminal.write(this.input);
+
+        // Give user a moment to see what's happening, then execute
+        setTimeout(() => {
+            this.exec();
+        }, 500);
     }
 
     private handleVoiceEvent(event: VoiceEvent): void {

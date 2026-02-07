@@ -2,7 +2,10 @@ import type { ProgramInterface, Context } from '../interface';
 import type { Program } from '../base';
 import c from 'ansi-colors';
 import { STATUS_ICONS, STATUS_LABELS, ERROR_MESSAGES } from '../../voice/constants';
+import encodeQR from 'qr';
 c.enabled = true;
+
+const SITE_URL = 'https://bcnelson.dev';
 
 const SUBCOMMANDS = ['id', 'call', 'answer', 'hangup', 'reject', 'mute', 'unmute', 'status'] as const;
 type Subcommand = typeof SUBCOMMANDS[number];
@@ -12,19 +15,19 @@ function showUsage(pi: ProgramInterface): Promise<number> {
         await pi.writeln('Usage: voice <subcommand>');
         await pi.writeln('');
         await pi.writeln('Subcommands:');
-        await pi.writeln('  id        Display your peer ID');
-        await pi.writeln('  call      Call another peer: voice call <peer-id>');
-        await pi.writeln('  answer    Accept incoming call');
-        await pi.writeln('  hangup    End current call');
-        await pi.writeln('  reject    Reject incoming call');
-        await pi.writeln('  mute      Mute microphone');
-        await pi.writeln('  unmute    Unmute microphone');
-        await pi.writeln('  status    Show call status');
+        await pi.writeln('  id [--qr]  Display your peer ID (--qr or -q for QR code)');
+        await pi.writeln('  call       Call another peer: voice call <peer-id>');
+        await pi.writeln('  answer     Accept incoming call');
+        await pi.writeln('  hangup     End current call');
+        await pi.writeln('  reject     Reject incoming call');
+        await pi.writeln('  mute       Mute microphone');
+        await pi.writeln('  unmute     Unmute microphone');
+        await pi.writeln('  status     Show call status');
         return 0;
     })();
 }
 
-async function handleId(pi: ProgramInterface): Promise<number> {
+async function handleId(pi: ProgramInterface, showQR: boolean): Promise<number> {
     const voice = pi.voiceService;
     const state = voice.getState();
 
@@ -40,7 +43,27 @@ async function handleId(pi: ProgramInterface): Promise<number> {
 
     const peerId = voice.getState().peerId;
     await pi.writeln(`Your peer ID: ${c.cyan(peerId!)}`);
-    await pi.writeln(c.gray('Share this ID with others to receive calls.'));
+
+    if (showQR) {
+        const callUrl = `${SITE_URL}/?call=${peerId}`;
+        await pi.writeln('');
+        await pi.writeln('Scan this QR code to call:');
+        await pi.writeln('');
+
+        // Generate QR code using terminal-friendly output
+        const qrString = encodeQR(callUrl, 'term', { ecc: 'medium' });
+        // Split by newlines and output each line
+        const lines = qrString.split('\n');
+        for (const line of lines) {
+            await pi.writeln(line);
+        }
+
+        await pi.writeln('');
+        await pi.writeln(`URL: ${c.cyan(callUrl)}`);
+    } else {
+        await pi.writeln(c.gray('Share this ID with others to receive calls.'));
+        await pi.writeln(c.gray('Use --qr or -q to display a scannable QR code.'));
+    }
     return 0;
 }
 
@@ -182,8 +205,11 @@ export default {
         }
 
         switch (subcommand) {
-            case 'id':
-                return handleId(programInterface);
+            case 'id': {
+                // Check for --qr or -q flag
+                const showQR = args.includes('--qr') || args.includes('-q');
+                return handleId(programInterface, showQR);
+            }
             case 'call':
                 return handleCall(programInterface, args[1]);
             case 'answer':
