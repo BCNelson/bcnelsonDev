@@ -6,12 +6,16 @@ interface Props {
 const { class: className = "" } = Astro.props;
 ---
 
+<!-- Backdrop overlay for maximized state -->
+<div id="terminal-backdrop" class="terminal-backdrop"></div>
+
 <div
-  class={`bg-surface-terminal rounded-lg overflow-hidden border-gradient w-full max-w-full ${className}`}
+  id="terminal-window"
+  class={`terminal-window bg-surface-terminal rounded-lg overflow-hidden border-gradient w-full max-w-full ${className}`}
 >
   <!-- Title bar -->
   <div
-    class="flex items-center px-4 py-2 bg-surface-secondary border-b border-border"
+    class="flex items-center justify-between px-4 py-2 bg-surface-secondary border-b border-border"
   >
     <!-- Terminal icon -->
     <div class="flex items-center gap-2">
@@ -20,10 +24,124 @@ const { class: className = "" } = Astro.props;
       </svg>
       <span class="font-mono text-xs text-slate-400">terminal</span>
     </div>
+
+    <!-- Maximize button -->
+    <button
+      id="terminal-maximize-btn"
+      class="p-1.5 rounded text-slate-400 hover:text-accent-cyan hover:bg-surface-tertiary transition-colors"
+      aria-label="Maximize terminal"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+      </svg>
+    </button>
+    <!-- Close button (only visible when maximized) -->
+    <button
+      id="terminal-close-btn"
+      class="hidden p-1.5 rounded text-slate-400 hover:text-red-400 hover:bg-surface-tertiary transition-colors"
+      aria-label="Close fullscreen terminal"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
   </div>
 
   <!-- Terminal content -->
-  <div class="overflow-hidden w-full max-w-full">
+  <div class="terminal-content overflow-hidden w-full max-w-full">
     <slot />
   </div>
 </div>
+
+<style>
+  .terminal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 60;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .terminal-backdrop.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  .terminal-window {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .terminal-window.maximized {
+    position: fixed;
+    inset: 0;
+    z-index: 61;
+    max-width: none;
+    border-radius: 0;
+  }
+
+  .terminal-window.maximized .terminal-content {
+    height: calc(100% - 40px);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const terminalWindow = document.getElementById('terminal-window');
+    const backdrop = document.getElementById('terminal-backdrop');
+    const maximizeBtn = document.getElementById('terminal-maximize-btn');
+    const closeBtn = document.getElementById('terminal-close-btn');
+
+    if (!terminalWindow || !backdrop || !maximizeBtn || !closeBtn) {
+      console.error('Terminal maximize: missing elements');
+      return;
+    }
+
+    function openMaximize() {
+      terminalWindow.classList.add('maximized');
+      backdrop.classList.add('visible');
+      maximizeBtn.classList.add('hidden');
+      closeBtn.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+
+      // Dispatch resize event for FitAddon to recalculate
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 50);
+    }
+
+    function closeMaximize() {
+      terminalWindow.classList.remove('maximized');
+      backdrop.classList.remove('visible');
+      maximizeBtn.classList.remove('hidden');
+      closeBtn.classList.add('hidden');
+      document.body.style.overflow = '';
+
+      // Dispatch resize event for FitAddon to recalculate
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 50);
+    }
+
+    maximizeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openMaximize();
+    });
+
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeMaximize();
+    });
+
+    backdrop.addEventListener('click', closeMaximize);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && terminalWindow.classList.contains('maximized')) {
+        closeMaximize();
+      }
+    });
+  });
+</script>

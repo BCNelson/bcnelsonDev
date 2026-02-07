@@ -120,6 +120,12 @@ onMounted(async () => {
   overflow: hidden;
 }
 
+/* Override height when terminal is maximized */
+:global(.maximized) .terminal-wrapper {
+  height: 100% !important;
+  max-height: none !important;
+}
+
 .terminal-container {
   position: absolute;
   top: 12px;
