@@ -43,7 +43,6 @@ export interface PeerServerEnv {
 
 // PeerJS-compatible signaling server Durable Object
 export class PeerServer implements DurableObject {
-  private peerId: string | null = null;
   private env: PeerServerEnv;
   private ctx: DurableObjectState;
 
@@ -79,8 +78,6 @@ export class PeerServer implements DurableObject {
         return new Response('Missing peer ID', { status: 400 });
       }
 
-      this.peerId = peerId;
-
       // Close any existing connections (one connection per peer)
       const existingWs = this.ctx.getWebSockets();
       for (const ws of existingWs) {
@@ -94,7 +91,9 @@ export class PeerServer implements DurableObject {
       const pair = new WebSocketPair();
       const [client, server] = Object.values(pair);
 
+      // Accept WebSocket and attach peerId so it survives hibernation
       this.ctx.acceptWebSocket(server);
+      server.serializeAttachment({ peerId });
 
       // Send OPEN message to confirm connection
       server.send(JSON.stringify({
@@ -128,6 +127,9 @@ export class PeerServer implements DurableObject {
     }
 
     if (data.dst) {
+      // Retrieve peerId from WebSocket attachment (survives hibernation)
+      const { peerId } = ws.deserializeAttachment() as { peerId: string };
+
       try {
         const targetId = this.env.PEER_SERVER.idFromName(data.dst);
         const targetStub = this.env.PEER_SERVER.get(targetId);
@@ -137,7 +139,7 @@ export class PeerServer implements DurableObject {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...data,
-            src: this.peerId
+            src: peerId
           })
         }));
       } catch {
@@ -150,11 +152,11 @@ export class PeerServer implements DurableObject {
   }
 
   async webSocketClose(): Promise<void> {
-    this.peerId = null;
+    // No cleanup needed - attachment is tied to the WebSocket
   }
 
   async webSocketError(): Promise<void> {
-    this.peerId = null;
+    // No cleanup needed - attachment is tied to the WebSocket
   }
 }
 

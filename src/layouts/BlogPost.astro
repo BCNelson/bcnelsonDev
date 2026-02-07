@@ -4,11 +4,11 @@ import type { CollectionEntry } from "astro:content";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tldr } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-  <article class="max-w-3xl mx-auto">
+  <article class="max-w-3xl mx-auto mt-12 mb-16">
     <div class="mb-8">
       {heroImage && (
         <img
@@ -40,6 +40,18 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
         )}
       </div>
     </div>
+    {tldr && tldr.length > 0 && (
+      <details class="mb-8 border border-gray-700 rounded-lg">
+        <summary class="px-4 py-3 cursor-pointer text-gray-300 hover:text-white font-medium">
+          TL;DR
+        </summary>
+        <ul class="px-4 pb-4 pt-2 text-gray-300 list-disc list-inside space-y-1">
+          {tldr.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </details>
+    )}
     <div class="prose prose-lg prose-invert max-w-none">
       <slot />
     </div>
