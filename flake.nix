@@ -31,6 +31,7 @@
                   just
                   python3
                   pulumi
+                  pulumiPackages.pulumi-nodejs  # Node.js language plugin for the infrastructure program
                   wrangler
                   steam-run  # For running dynamically linked binaries (workerd)
                 ];
