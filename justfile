@@ -25,6 +25,16 @@ preview:
 deploy: build
     npx wrangler deploy
 
+# --- Subdomain Workers (workers/<name>/) ---
+
+# Run a subdomain Worker locally
+worker-dev name:
+    steam-run npx wrangler dev --config workers/{{name}}/wrangler.json
+
+# Deploy a subdomain Worker (requires CLOUDFLARE_API_TOKEN)
+worker-deploy name:
+    npx wrangler deploy --config workers/{{name}}/wrangler.json
+
 # --- Pulumi Infrastructure ---
 
 # Type check infrastructure code
