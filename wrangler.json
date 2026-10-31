@@ -1,5 +1,6 @@
 {
   "name": "bcnelson-dev",
+  "account_id": "6845b4667e7d57b1e4c52a8ab526e484",
   "main": "./dist/_worker.js",
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
