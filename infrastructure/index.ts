@@ -109,6 +109,5 @@ const webAnalytics = new cloudflare.WebAnalyticsSite("bcnelson-dev-analytics", {
 // Exports
 export const workerName = workerScript.scriptName;
 export const workerUrl = pulumi.interpolate`https://${domain}`;
-export const workersDevUrl = pulumi.interpolate`https://bcnelson-dev.${accountId}.workers.dev`;
 export const webAnalyticsToken = webAnalytics.siteToken;
 // Note: Turnstile keys are bound directly to the Worker, no need to export them
