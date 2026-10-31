@@ -9,7 +9,16 @@
   "assets": {
     "binding": "ASSETS"
   },
-  "keep_vars": true,
+  "vars": {
+    "TURNSTILE_SITE_KEY": "0x4AAAAAACLLmoI8XcR5vxZr"
+  },
+  "secrets_store_secrets": [
+    {
+      "binding": "TURNSTILE_SECRET",
+      "store_id": "436684a7bf7344609cb63801ee1089b6",
+      "secret_name": "TURNSTILE_SECRET"
+    }
+  ],
   "send_email": [
     {
       "name": "CONTACT_EMAIL",

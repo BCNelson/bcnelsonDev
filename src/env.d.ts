@@ -3,7 +3,7 @@
 // Bindings typed on Cloudflare.Env so `env` from "cloudflare:workers" sees them
 declare namespace Cloudflare {
   interface Env {
-    TURNSTILE_SECRET_KEY: string;
+    TURNSTILE_SECRET: SecretsStoreSecret;
     TURNSTILE_SITE_KEY: string;
     CONTACT_EMAIL: {
       send: (message: EmailMessage) => Promise<void>;

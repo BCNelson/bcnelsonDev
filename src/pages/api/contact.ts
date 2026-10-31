@@ -56,8 +56,10 @@ function escapeHtml(str: string): string {
 
 export async function POST(context: APIContext) {
   try {
-    if (!env.TURNSTILE_SECRET_KEY) {
-      console.error("TURNSTILE_SECRET_KEY not configured");
+    // Secrets Store get() throws when the secret does not exist
+    const turnstileSecret = await env.TURNSTILE_SECRET?.get().catch(() => undefined);
+    if (!turnstileSecret) {
+      console.error("TURNSTILE_SECRET not configured");
       return new Response(
         JSON.stringify({ success: false, error: "Server configuration error" }),
         { status: 500, headers: { "Content-Type": "application/json" } }
@@ -100,7 +102,7 @@ export async function POST(context: APIContext) {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-          secret: env.TURNSTILE_SECRET_KEY,
+          secret: turnstileSecret,
           response: formData.turnstileToken,
         }),
       }

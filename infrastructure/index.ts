@@ -14,7 +14,6 @@ const zoneId = config.requireSecret("cloudflareZoneId");
 // Set it with: pulumi config set --secret cloudflare:apiToken <token>
 
 // Cloudflare Turnstile Widget for contact form bot protection
-// Created before the Worker so we can bind the secret to the Worker
 const turnstileWidget = new cloudflare.TurnstileWidget("bcnelson-dev-turnstile", {
   accountId: accountId,
   name: "bcnelson.dev Contact Form",
@@ -40,50 +39,26 @@ const contactEmailDestination = new cloudflare.EmailRoutingAddress(
   }
 );
 
-// Cloudflare Worker Script
-// Note: The actual script content is deployed via `wrangler deploy`
-// This resource manages bindings only - content is ignored to prevent overwriting wrangler deploys
-const workerScript = new cloudflare.WorkersScript(
-  "bcnelson-dev-worker",
-  {
-    accountId: accountId,
-    scriptName: "bcnelson-dev",
-    content:
-      "export default { fetch() { return new Response('Deployed via Wrangler'); } }",
-    mainModule: "index.js",
-    compatibilityDate: "2025-01-01",
-    compatibilityFlags: ["nodejs_compat"],
-    bindings: [
-      {
-        name: "TURNSTILE_SECRET_KEY",
-        type: "secret_text",
-        text: turnstileWidget.secret,
-      },
-      {
-        name: "TURNSTILE_SITE_KEY",
-        type: "plain_text",
-        text: turnstileWidget.sitekey,
-      },
-      {
-        name: "CONTACT_EMAIL",
-        type: "send_email",
-        destinationAddress: contactEmail,
-      },
-    ],
-    // Keep bindings when wrangler deploys new code
-    keepBindings: ["secret_text", "plain_text", "send_email"],
-  },
-  {
-    // Don't overwrite the actual site content deployed by wrangler
-    ignoreChanges: ["content"],
-  }
-);
+// The Worker itself, its code and all of its bindings are deployed by wrangler
+// (see wrangler.json). Cloudflare ties bindings to a script version, so any
+// Pulumi resource that sets them also uploads script content.
+const workerName = "bcnelson-dev";
+
+// Turnstile secret, bound to the Worker through Secrets Store in wrangler.json
+const secretsStoreId = config.require("secretsStoreId");
+const turnstileSecret = new cloudflare.SecretsStoreSecret("turnstile-secret", {
+  accountId: accountId,
+  storeId: secretsStoreId,
+  name: "TURNSTILE_SECRET",
+  value: turnstileWidget.secret,
+  scopes: ["workers"],
+});
 
 // Workers Custom Domain (routes traffic from domain to worker)
 const workerDomain = new cloudflare.WorkersCustomDomain("bcnelson-dev-domain", {
   accountId: accountId,
   hostname: domain,
-  service: workerScript.scriptName,
+  service: workerName,
   zoneId: zoneId,
 });
 
@@ -107,7 +82,8 @@ const webAnalytics = new cloudflare.WebAnalyticsSite("bcnelson-dev-analytics", {
 });
 
 // Exports
-export const workerName = workerScript.scriptName;
+export { workerName };
 export const workerUrl = pulumi.interpolate`https://${domain}`;
 export const webAnalyticsToken = webAnalytics.siteToken;
-// Note: Turnstile keys are bound directly to the Worker, no need to export them
+// Public key; wrangler.json sets it as the TURNSTILE_SITE_KEY var
+export const turnstileSiteKey = turnstileWidget.sitekey;

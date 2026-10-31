@@ -5,3 +5,4 @@ config:
   cloudflare:apiToken:
     secure: AAABAFsMeuJYpMjkh13i9IUtodeLFizsXF50QgUpSO9SZWkXfwzrrnr524aJb8VHjOKVZMkDGtG3LoHHcc/ohfYaMWnl8euv
   bcnelson-dev-infra:contactEmail: bradley@nel.family
+  bcnelson-dev-infra:secretsStoreId: 436684a7bf7344609cb63801ee1089b6
