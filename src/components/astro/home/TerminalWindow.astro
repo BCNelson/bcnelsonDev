@@ -28,7 +28,7 @@ const { class: className = "" } = Astro.props;
     <!-- Maximize button -->
     <button
       id="terminal-maximize-btn"
-      class="p-1.5 rounded text-slate-400 hover:text-accent-cyan hover:bg-surface-tertiary transition-colors"
+      class="p-1.5 rounded-sm text-slate-400 hover:text-accent-cyan hover:bg-surface-tertiary transition-colors"
       aria-label="Maximize terminal"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@ const { class: className = "" } = Astro.props;
     <!-- Close button (only visible when maximized) -->
     <button
       id="terminal-close-btn"
-      class="hidden p-1.5 rounded text-slate-400 hover:text-red-400 hover:bg-surface-tertiary transition-colors"
+      class="hidden p-1.5 rounded-sm text-slate-400 hover:text-red-400 hover:bg-surface-tertiary transition-colors"
       aria-label="Close fullscreen terminal"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

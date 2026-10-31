@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import vue from "@astrojs/vue";
 import cloudflare from "@astrojs/cloudflare";
 
@@ -11,7 +11,6 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap(),
-    tailwind(),
     vue(),
   ],
   adapter: cloudflare({
@@ -22,6 +21,7 @@ export default defineConfig({
     },
   }),
   vite: {
+    plugins: [tailwindcss()],
     ssr: {
       // xterm.js requires DOM and cannot be server-rendered
       external: ["@xterm/xterm", "@xterm/addon-fit", "@xterm/addon-web-links"],

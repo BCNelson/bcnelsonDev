@@ -69,7 +69,7 @@ const socialLinks = [
                 required
                 minlength="2"
                 placeholder="Identify yourself"
-                class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-none"
+                class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-hidden"
               />
             </div>
 
@@ -87,7 +87,7 @@ const socialLinks = [
                 name="email"
                 required
                 placeholder="name@domain.com"
-                class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-none"
+                class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-hidden"
               />
             </div>
           </div>
@@ -107,7 +107,7 @@ const socialLinks = [
               required
               minlength="10"
               placeholder="What's the handshake about?"
-              class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-none resize-none"
+              class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-accent-cyan focus:border-transparent focus:outline-hidden resize-none"
             ></textarea>
           </div>
 
@@ -115,13 +115,13 @@ const socialLinks = [
           <div id="turnstile-container"></div>
 
           <!-- Status Message -->
-          <div id="form-status" class="hidden text-sm font-mono p-3 rounded"></div>
+          <div id="form-status" class="hidden text-sm font-mono p-3 rounded-sm"></div>
 
           <!-- Submit Button -->
           <button
             type="submit"
             id="submit-btn"
-            class="w-full bg-accent-cyan text-surface-primary font-mono font-semibold py-4 rounded-lg hover:bg-accent-cyan-bright hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full bg-accent-cyan text-surface-primary font-mono font-semibold py-4 rounded-lg hover:bg-accent-cyan-bright hover:shadow-glow transition-all uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span id="btn-text">TRANSMIT_DATA</span>
             <span id="btn-loading" class="hidden">TRANSMITTING...</span>

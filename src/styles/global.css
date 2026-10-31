@@ -1,6 +1,381 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-surface-primary: #0a0a0f;
+  --color-surface-secondary: #12131a;
+  --color-surface-tertiary: #1a1b23;
+  --color-surface-terminal: #0d0e14;
+
+  --color-accent-cyan: #22d3ee;
+  --color-accent-cyan-bright: #67e8f9;
+  --color-accent-cyan-dim: #0891b2;
+  --color-accent-blue: #3b82f6;
+
+  --color-border: #1e293b;
+  --color-border-accent: rgba(34, 211, 238, 0.3);
+
+  --font-mono: JetBrains Mono, Fira Code, SF Mono, Consolas, monospace;
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+
+  --animate-blink: blink 1s step-end infinite;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-typing-cursor: typing-cursor 1s step-end infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+
+  --shadow-glow-sm: 0 0 10px rgba(34, 211, 238, 0.3);
+  --shadow-glow: 0 0 20px rgba(34, 211, 238, 0.4);
+  --shadow-glow-lg: 0 0 30px rgba(34, 211, 238, 0.5);
+
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes typing-cursor {
+    0%,
+    100% {
+      border-color: currentColor;
+    }
+    50% {
+      border-color: transparent;
+    }
+  }
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 5px rgba(34, 211, 238, 0.5);
+    }
+    to {
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.8);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility text-gradient {
+  /* Gradient text - cyan */
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility text-gradient-purple {
+  /* Gradient text - purple to cyan */
+  background: linear-gradient(
+    135deg,
+    var(--accent-purple) 0%,
+    var(--accent-cyan) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility text-gradient-blue {
+  /* Gradient text - blue to purple */
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-purple) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility bg-gradient-dark {
+  /* Gradient backgrounds */
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary) 0%,
+    var(--bg-secondary) 100%
+  );
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility bg-gradient-purple {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.1) 0%,
+    rgba(34, 211, 238, 0.05) 100%
+  );
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility bg-gradient-mesh {
+  background:
+    radial-gradient(at 40% 20%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(34, 211, 238, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+    var(--bg-primary);
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility glow-cyan {
+  /* Glow effects */
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility glow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility glow-multi {
+  box-shadow:
+    0 0 20px rgba(34, 211, 238, 0.3),
+    0 0 40px rgba(139, 92, 246, 0.2);
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility glow-cyan-hover {
+  &:hover {
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.6);
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility border-gradient {
+  /* Gradient border */
+  position: relative;
+  background: var(--bg-secondary);
+  border-radius: 0.75rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      var(--accent-cyan),
+      var(--accent-purple)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility border-gradient-animated {
+  /* Animated gradient border */
+  &::before {
+    background: linear-gradient(
+      var(--angle, 135deg),
+      var(--accent-cyan),
+      var(--accent-purple),
+      var(--accent-blue),
+      var(--accent-cyan)
+    );
+    animation: rotate-gradient 3s linear infinite;
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+}
+
+@utility terminal-prompt {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+
+  /* Terminal prompt styling */
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@utility terminal-prompt-user {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+  color: var(--accent-cyan);
+}
+
+@utility terminal-prompt-path {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+  color: var(--text-secondary);
+}
+
+@utility cursor-blink {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+
+  /* Blinking cursor */
+  &::after {
+    content: '█';
+    animation: blink 1s step-end infinite;
+  }
+}
+
+@utility status-pulse {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+
+  /* Status indicator pulse */
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--status-online);
+    animation: status-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+
+@utility section-gradient-1 {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+
+  /* Colored section backgrounds */
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary) 0%,
+    rgba(139, 92, 246, 0.05) 50%,
+    var(--bg-primary) 100%
+  );
+}
+
+@utility section-gradient-2 {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary) 0%,
+    rgba(34, 211, 238, 0.05) 50%,
+    var(--bg-primary) 100%
+  );
+}
+
+@utility section-gradient-3 {
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 135deg;
+    inherits: false;
+  }
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary) 0%,
+    rgba(59, 130, 246, 0.05) 50%,
+    var(--bg-primary) 100%
+  );
+}
+
+@utility backdrop-blur-nav {
+  /* Backdrop blur for navbar */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 
 @layer base {
   :root {
@@ -61,125 +436,6 @@
 }
 
 @layer components {
-  /* Gradient text - cyan */
-  .text-gradient {
-    background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Gradient text - purple to cyan */
-  .text-gradient-purple {
-    background: linear-gradient(
-      135deg,
-      var(--accent-purple) 0%,
-      var(--accent-cyan) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Gradient text - blue to purple */
-  .text-gradient-blue {
-    background: linear-gradient(
-      135deg,
-      var(--accent-blue) 0%,
-      var(--accent-purple) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Gradient backgrounds */
-  .bg-gradient-dark {
-    background: linear-gradient(
-      180deg,
-      var(--bg-primary) 0%,
-      var(--bg-secondary) 100%
-    );
-  }
-
-  .bg-gradient-purple {
-    background: linear-gradient(
-      135deg,
-      rgba(139, 92, 246, 0.1) 0%,
-      rgba(34, 211, 238, 0.05) 100%
-    );
-  }
-
-  .bg-gradient-mesh {
-    background: radial-gradient(
-        at 40% 20%,
-        rgba(139, 92, 246, 0.15) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 80% 0%,
-        rgba(34, 211, 238, 0.1) 0px,
-        transparent 50%
-      ),
-      radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
-      var(--bg-primary);
-  }
-
-  /* Glow effects */
-  .glow-cyan {
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
-  }
-
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-  }
-
-  .glow-multi {
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3),
-      0 0 40px rgba(139, 92, 246, 0.2);
-  }
-
-  .glow-cyan-hover:hover {
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.6);
-  }
-
-  /* Gradient border */
-  .border-gradient {
-    position: relative;
-    background: var(--bg-secondary);
-    border-radius: 0.75rem;
-  }
-
-  .border-gradient::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      135deg,
-      var(--accent-cyan),
-      var(--accent-purple)
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-
-  /* Animated gradient border */
-  .border-gradient-animated::before {
-    background: linear-gradient(
-      var(--angle, 135deg),
-      var(--accent-cyan),
-      var(--accent-purple),
-      var(--accent-blue),
-      var(--accent-cyan)
-    );
-    animation: rotate-gradient 3s linear infinite;
-  }
-
   @keyframes rotate-gradient {
     to {
       --angle: 495deg;
@@ -192,25 +448,6 @@
     inherits: false;
   }
 
-  /* Terminal prompt styling */
-  .terminal-prompt {
-    font-family: "JetBrains Mono", monospace;
-  }
-
-  .terminal-prompt-user {
-    color: var(--accent-cyan);
-  }
-
-  .terminal-prompt-path {
-    color: var(--text-secondary);
-  }
-
-  /* Blinking cursor */
-  .cursor-blink::after {
-    content: "█";
-    animation: blink 1s step-end infinite;
-  }
-
   @keyframes blink {
     0%,
     100% {
@@ -221,61 +458,11 @@
     }
   }
 
-  /* Status indicator pulse */
-  .status-pulse {
-    position: relative;
-  }
-
-  .status-pulse::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background-color: var(--status-online);
-    animation: status-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-
   @keyframes status-ping {
     75%,
     100% {
       transform: scale(2);
       opacity: 0;
     }
-  }
-
-  /* Colored section backgrounds */
-  .section-gradient-1 {
-    background: linear-gradient(
-      180deg,
-      var(--bg-primary) 0%,
-      rgba(139, 92, 246, 0.05) 50%,
-      var(--bg-primary) 100%
-    );
-  }
-
-  .section-gradient-2 {
-    background: linear-gradient(
-      180deg,
-      var(--bg-primary) 0%,
-      rgba(34, 211, 238, 0.05) 50%,
-      var(--bg-primary) 100%
-    );
-  }
-
-  .section-gradient-3 {
-    background: linear-gradient(
-      180deg,
-      var(--bg-primary) 0%,
-      rgba(59, 130, 246, 0.05) 50%,
-      var(--bg-primary) 100%
-    );
-  }
-}
-
-@layer utilities {
-  /* Backdrop blur for navbar */
-  .backdrop-blur-nav {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
 }
