@@ -43,7 +43,7 @@ function formatDate(date: Date): string {
           <div class="space-y-4">
             {posts.map((post) => (
               <a
-                href={`/blog/${post.slug}`}
+                href={`/blog/${post.id}`}
                 class="block group bg-surface-secondary/50 border border-border rounded-lg p-6 transition-all duration-300 hover:border-border-accent hover:bg-surface-secondary hover:shadow-glow-sm"
               >
                 <div class="flex flex-col gap-3">

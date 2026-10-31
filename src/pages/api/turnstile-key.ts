@@ -1,8 +1,9 @@
-import type { APIContext } from "astro";
+import { env } from "cloudflare:workers";
 
-export async function GET(context: APIContext) {
-  const env = context.locals.runtime?.env as { TURNSTILE_SITE_KEY?: string } | undefined;
-  const siteKey = env?.TURNSTILE_SITE_KEY ?? "";
+export const prerender = false;
+
+export async function GET() {
+  const siteKey = env.TURNSTILE_SITE_KEY ?? "";
 
   return new Response(JSON.stringify({ siteKey }), {
     status: 200,

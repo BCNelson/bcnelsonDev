@@ -13,12 +13,13 @@ export default defineConfig({
     sitemap(),
     vue(),
   ],
+  // The site has no sessions or astro:assets images, so skip the KV and
+  // Images bindings the adapter would otherwise provision.
+  session: false,
   adapter: cloudflare({
-    platformProxy: { enabled: true },
-    workerEntryPoint: {
-      path: "src/worker.ts",
-      namedExports: ["PeerServer"],
-    },
+    imageService: "passthrough",
+    // workerd cannot run on NixOS, and prerendered pages need no Workers APIs.
+    prerenderEnvironment: "node",
   }),
   vite: {
     plugins: [tailwindcss()],

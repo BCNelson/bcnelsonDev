@@ -1,5 +1,8 @@
 import type { APIContext } from "astro";
+import { env } from "cloudflare:workers";
 import { createMimeMessage } from "mimetext";
+
+export const prerender = false;
 
 interface ContactFormData {
   name: string;
@@ -53,11 +56,6 @@ function escapeHtml(str: string): string {
 
 export async function POST(context: APIContext) {
   try {
-    const env = context.locals.runtime.env as {
-      TURNSTILE_SECRET_KEY?: string;
-      CONTACT_EMAIL?: { send: (message: EmailMessage) => Promise<void> };
-    };
-
     if (!env.TURNSTILE_SECRET_KEY) {
       console.error("TURNSTILE_SECRET_KEY not configured");
       return new Response(

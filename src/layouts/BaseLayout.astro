@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import BaseHead from "../components/astro/BaseHead.astro";
 import Navbar from "../components/astro/Navbar.astro";
 import ContactCTA from "../components/astro/ContactCTA.astro";
@@ -23,7 +23,7 @@ const {
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} />
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body class="min-h-screen flex flex-col bg-surface-primary text-slate-100">
     <Navbar />
