@@ -45,3 +45,18 @@ jobs:
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      # Each workers/<name>/ is its own Worker on its own subdomain. One with a
+      # package.json gets its dependencies installed and its build script run.
+      - name: Deploy subdomain Workers
+        run: |
+          for dir in workers/*/; do
+            [ -f "$dir/wrangler.json" ] || continue
+            if [ -f "$dir/package.json" ]; then
+              npm ci --prefix "$dir"
+              npm run build --prefix "$dir" --if-present
+            fi
+            npx wrangler deploy --config "$dir/wrangler.json"
+          done
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
