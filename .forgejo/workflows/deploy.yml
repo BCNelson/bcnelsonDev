@@ -5,16 +5,38 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Pulumi locks the stack, but queueing beats failing on the lock.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: docker
     container:
       image: node:26-bookworm
+    env:
+      PULUMI_VERSION: "3.268.0"
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm ci --prefix infrastructure
+
+      - name: Install Pulumi
+        run: |
+          curl -fsSL https://get.pulumi.com | sh -s -- --version "$PULUMI_VERSION"
+          echo "$HOME/.pulumi/bin" >> "$GITHUB_PATH"
+
+      # Pulumi runs first: updating the WorkersScript resource can drop the
+      # bindings wrangler owns, and the wrangler deploy below restores them.
+      - name: Update infrastructure
+        working-directory: infrastructure
+        run: pulumi up --stack prod --yes --non-interactive
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: Build Astro site
         run: npm run build
