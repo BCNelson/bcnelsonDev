@@ -1,0 +1,23 @@
+{
+  "name": "@bcnelson/auth-client",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "jose": "^6.2.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261031.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./browser": "./src/browser.ts"
+  }
+}

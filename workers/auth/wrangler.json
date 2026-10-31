@@ -1,0 +1,66 @@
+{
+  "name": "bcnelson-dev-auth",
+  "account_id": "6845b4667e7d57b1e4c52a8ab526e484",
+  "main": "./src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "auth.bcnelson.dev",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "ISSUER": "https://auth.bcnelson.dev",
+    "COOKIE_DOMAIN": "bcnelson.dev",
+    "RP_ID": "bcnelson.dev",
+    "ALLOWED_ORIGINS": "https://auth.bcnelson.dev",
+    "ADMIN_EMAILS": "bradley@nel.family",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAACLLmoI8XcR5vxZr",
+    "GITHUB_CLIENT_ID": "",
+    "GOOGLE_CLIENT_ID": ""
+  },
+  "secrets_store_secrets": [
+    {
+      "binding": "TURNSTILE_SECRET",
+      "store_id": "436684a7bf7344609cb63801ee1089b6",
+      "secret_name": "TURNSTILE_SECRET"
+    },
+    {
+      "binding": "AUTH_SIGNING_KEY",
+      "store_id": "436684a7bf7344609cb63801ee1089b6",
+      "secret_name": "AUTH_SIGNING_KEY"
+    },
+    {
+      "binding": "GITHUB_CLIENT_SECRET",
+      "store_id": "436684a7bf7344609cb63801ee1089b6",
+      "secret_name": "GITHUB_CLIENT_SECRET"
+    },
+    {
+      "binding": "GOOGLE_CLIENT_SECRET",
+      "store_id": "436684a7bf7344609cb63801ee1089b6",
+      "secret_name": "GOOGLE_CLIENT_SECRET"
+    }
+  ],
+  "ratelimits": [
+    { "name": "RL_IP", "namespace_id": "1001", "simple": { "limit": 20, "period": 60 } },
+    { "name": "RL_IDENTIFIER", "namespace_id": "1002", "simple": { "limit": 10, "period": 60 } }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "USER_INDEX", "class_name": "UserIndex" },
+      { "name": "USER", "class_name": "User" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["UserIndex", "User"] }
+  ],
+  "send_email": [
+    { "name": "EMAIL", "allowed_sender_addresses": ["no-reply@bcnelson.dev"] }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
