@@ -9,6 +9,13 @@
   "assets": {
     "binding": "ASSETS"
   },
+  "keep_vars": true,
+  "send_email": [
+    {
+      "name": "CONTACT_EMAIL",
+      "destination_address": "bradley@nel.family"
+    }
+  ],
   "observability": {
     "enabled": true
   },
