@@ -17,7 +17,7 @@ const zoneId = config.requireSecret("cloudflareZoneId");
 const turnstileWidget = new cloudflare.TurnstileWidget("bcnelson-dev-turnstile", {
   accountId: accountId,
   name: "bcnelson.dev Contact Form",
-  domains: [domain, `www.${domain}`, "localhost"],
+  domains: [domain, `www.${domain}`, `auth.${domain}`, "localhost"],
   mode: "managed",
 });
 
@@ -54,6 +54,47 @@ const turnstileSecret = new cloudflare.SecretsStoreSecret("turnstile-secret", {
   scopes: ["workers"],
 });
 
+// --- Auth Worker (workers/auth) ---
+// The Worker, its auth.<domain> custom domain and its bindings are deployed by
+// wrangler (workers/auth/wrangler.json). Pulumi runs first in CI, so the
+// secrets it binds exist before that deploy. TURNSTILE_SECRET is shared with
+// the site above.
+
+// Ed25519 JWK (or JWK Set during rotation) that signs session JWTs. Generate it with
+// `node workers/auth/scripts/generate-signing-key.ts | pulumi config set --secret authSigningKey`
+const authSigningKey = new cloudflare.SecretsStoreSecret("auth-signing-key", {
+  accountId: accountId,
+  storeId: secretsStoreId,
+  name: "AUTH_SIGNING_KEY",
+  value: config.requireSecret("authSigningKey"),
+  scopes: ["workers"],
+});
+
+// Social login client secrets. wrangler.json binds both, so they must exist even
+// while a provider is off; a provider is off while its *_CLIENT_ID var is empty.
+// Set with `pulumi config set --secret githubClientSecret <secret>` (likewise google).
+const unsetOAuthSecret = "not-configured";
+const oauthSecrets = [
+  ["github", "GITHUB_CLIENT_SECRET"],
+  ["google", "GOOGLE_CLIENT_SECRET"],
+].map(
+  ([provider, name]) =>
+    new cloudflare.SecretsStoreSecret(`auth-${provider}-client-secret`, {
+      accountId: accountId,
+      storeId: secretsStoreId,
+      name: name,
+      value: config.getSecret(`${provider}ClientSecret`) ?? pulumi.secret(unsetOAuthSecret),
+      scopes: ["workers"],
+    })
+);
+
+// Email Service sending domain for the auth Worker's send_email binding
+// (sender no-reply@<domain>). Cloudflare adds the SPF/DKIM/bounce DNS records.
+const emailSending = new cloudflare.EmailSendingSubdomain("bcnelson-dev-email-sending", {
+  zoneId: zoneId,
+  name: domain,
+});
+
 // Workers Custom Domain (routes traffic from domain to worker)
 const workerDomain = new cloudflare.WorkersCustomDomain("bcnelson-dev-domain", {
   accountId: accountId,
@@ -87,3 +128,4 @@ export const workerUrl = pulumi.interpolate`https://${domain}`;
 export const webAnalyticsToken = webAnalytics.siteToken;
 // Public key; wrangler.json sets it as the TURNSTILE_SITE_KEY var
 export const turnstileSiteKey = turnstileWidget.sitekey;
+export const authUrl = pulumi.interpolate`https://auth.${domain}`;

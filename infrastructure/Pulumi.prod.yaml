@@ -6,3 +6,5 @@ config:
     secure: AAABAFsMeuJYpMjkh13i9IUtodeLFizsXF50QgUpSO9SZWkXfwzrrnr524aJb8VHjOKVZMkDGtG3LoHHcc/ohfYaMWnl8euv
   bcnelson-dev-infra:contactEmail: bradley@nel.family
   bcnelson-dev-infra:secretsStoreId: 436684a7bf7344609cb63801ee1089b6
+  bcnelson-dev-infra:authSigningKey:
+    secure: AAABAF5T8WSAYfeB58/q+ziZCAO4cexNEDRrJ/kfP0e83HPB3i6IZ2dkkvxQJcPQ0TsUMm8OYneCdE5mUglDVUNifHhsvwNAIPSVNXjkVd0nTtOBGM45ehDtDlaUpYfgPoAgh7fo09jw3QwQkm+MCESTT8nwaKzCwhmnWFUXhVXxcQY7BCvZwUmHgqJ2uJHVIthw4S2/NWZOQfwhrroPaOGPg536rniBP1kG/MUUfKw4ou3FdOZkntvOjaNSdUzx2HVfhv5zbjZ1QlRGwfeM/DonGbZ7tD+gwIgc
