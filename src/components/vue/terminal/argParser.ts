@@ -47,7 +47,7 @@ export function parseArgs(args: string[], spec: ArgSpec[]): ParsedArgs {
   for (const s of spec) {
     if (s.short) shortToName.set(s.short, s.name);
     if (s.long) longToName.set(s.long, s.name);
-    if (s.hasValue) hasValue.set(s.name);
+    if (s.hasValue) hasValue.add(s.name);
   }
 
   let i = 0;

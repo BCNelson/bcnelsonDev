@@ -4,5 +4,5 @@
     "jsx": "preserve",
     "jsxImportSource": "vue"
   },
-  "include": ["src", "infrastructure"]
+  "include": [".astro/types.d.ts", "src", "infrastructure"]
 }
