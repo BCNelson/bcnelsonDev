@@ -27,8 +27,7 @@
             modules = [
               {
                 packages = with pkgs; [
-                  nodejs_20
-                  nodePackages.npm
+                  nodejs_26
                   just
                   python3
                   pulumi
