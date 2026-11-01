@@ -150,7 +150,12 @@ async function handleMute(pi: ProgramInterface): Promise<number> {
         return 1;
     }
 
-    voice.mute();
+    try {
+        voice.mute();
+    } catch (e) {
+        await pi.writeln(c.red(`Error: ${e instanceof Error ? e.message : ERROR_MESSAGES.NO_ACTIVE_CALL}`));
+        return 1;
+    }
     await pi.writeln(c.yellow('Microphone muted.'));
     return 0;
 }
@@ -164,7 +169,12 @@ async function handleUnmute(pi: ProgramInterface): Promise<number> {
         return 1;
     }
 
-    voice.unmute();
+    try {
+        voice.unmute();
+    } catch (e) {
+        await pi.writeln(c.red(`Error: ${e instanceof Error ? e.message : ERROR_MESSAGES.NO_ACTIVE_CALL}`));
+        return 1;
+    }
     await pi.writeln(c.green('Microphone unmuted.'));
     return 0;
 }

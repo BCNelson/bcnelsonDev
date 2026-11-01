@@ -20,6 +20,7 @@ export const ERROR_MESSAGES = {
     PERMISSION_DENIED: 'Microphone permission denied. Please allow microphone access and try again.',
     MEDIA_ERROR: 'Could not access microphone.',
     CONNECTION_FAILED: 'Connection to signaling server failed.',
+    ACTIVE_IN_OTHER_TAB: 'A call is active in another tab. Use that tab, or hang up there first.',
     CALL_FAILED: 'Call failed.',
 } as const;
 
