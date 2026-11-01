@@ -38,6 +38,12 @@ export const loginRoutes = new Hono<AppEnv>();
 
 loginRoutes.use('/login/password', noStore);
 
+/** The root: the profile when signed in, otherwise sign-in (which then returns to the profile). */
+loginRoutes.get('/', async (c) => {
+  if (await currentAccessToken(c)) return c.redirect('/profile', 302);
+  return c.redirect(`/login?return_to=${encodeURIComponent(`${c.env.ISSUER}/profile`)}`, 302);
+});
+
 /**
  * Signed in already → straight to return_to; refresh cookie only → /refresh first.
  * `?reauth=1` (http/auth requireReauth) always shows the form, identifier prefilled.

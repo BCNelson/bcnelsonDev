@@ -295,6 +295,22 @@ describe('pages', () => {
     expect(known).toContain('Incorrect username, email or password.');
   });
 
+  it('GET / redirects to the profile when signed in, otherwise to sign-in', async () => {
+    let page = await get('/');
+    expect(page.status).toBe(302);
+    const toLogin = `/login?return_to=${encodeURIComponent(`${fake.env.ISSUER}/profile`)}`;
+    expect(page.headers.get('Location')).toBe(toLogin);
+
+    const res = await signUp();
+    page = await get('/', { Cookie: `${config.ACCESS_COOKIE}=${cookies(res)[config.ACCESS_COOKIE]!}` });
+    expect(page.status).toBe(302);
+    expect(page.headers.get('Location')).toBe('/profile');
+
+    // A refresh cookie alone goes through /login, which refreshes and returns to the profile.
+    page = await get('/', { Cookie: `${config.REFRESH_COOKIE}=${cookies(res)[config.REFRESH_COOKIE]!}` });
+    expect(page.headers.get('Location')).toBe(toLogin);
+  });
+
   it('GET /login redirects when already signed in, or via /refresh with only a refresh cookie', async () => {
     const res = await signUp();
     const at = cookies(res)[config.ACCESS_COOKIE]!;
