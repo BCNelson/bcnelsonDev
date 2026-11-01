@@ -30,6 +30,8 @@ export interface VoiceEvent {
     data?: {
         peerId?: string;
         error?: string;
+        /** Seconds the call was connected (call-ended, when it connected) */
+        duration?: number;
         previousStatus?: VoiceStatus;
         newStatus?: VoiceStatus;
     };

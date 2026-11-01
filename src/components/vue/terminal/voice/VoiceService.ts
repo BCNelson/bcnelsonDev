@@ -413,19 +413,22 @@ export class VoiceService {
             throw new Error(ERROR_MESSAGES.NO_ACTIVE_CALL);
         }
 
-        const duration = this.getCallDuration();
-
-        if (this.currentCall) {
-            this.currentCall.close();
+        const calls = [this.currentCall, this.incomingCall];
+        // End first so the calls' close handlers see they're no longer current
+        this.endCall();
+        for (const call of calls) {
+            call?.close();
         }
-        if (this.incomingCall) {
-            this.incomingCall.close();
-        }
+    }
 
+    // Cleans up the current call and announces its end once
+    private endCall(): void {
+        const peerId = this.state.remotePeerId ?? undefined;
+        const duration = this.state.callStartTime ? this.getCallDuration() : undefined;
         this.cleanupCall();
         this.emit({
             type: 'call-ended',
-            data: { peerId: this.state.remotePeerId ?? undefined },
+            data: { peerId, duration },
         });
     }
 
@@ -490,15 +493,16 @@ export class VoiceService {
         });
 
         call.on('close', () => {
-            this.cleanupCall();
-            this.emit({
-                type: 'call-ended',
-                data: { peerId: call.peer },
-            });
+            if (this.currentCall === call) {
+                this.endCall();
+            }
         });
 
         call.on('error', (err) => {
             console.error('Call error:', err);
+            if (this.currentCall !== call) {
+                return;
+            }
             this.cleanupCall();
             this.emit({
                 type: 'error',

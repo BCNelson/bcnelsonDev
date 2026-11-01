@@ -12,6 +12,7 @@ export class TerminalManager {
     private _terminal: Terminal;
     private input = "";
     private position = 0;
+    private running = false;
     private env: Record<string, string> = {
         "HOME": "/home/visitor",
         "PWD": "/home/visitor"
@@ -101,11 +102,14 @@ export class TerminalManager {
                     `${c.green('✓')} ${c.green('Call connected with')} ${c.cyan(event.data?.peerId ?? 'peer')}\r\n`
                 );
                 break;
-            case 'call-ended':
+            case 'call-ended': {
+                const duration = event.data?.duration;
+                const suffix = duration === undefined ? '' : ` Duration: ${this.voiceService.formatDuration(duration)}`;
                 this.showNotification(
-                    `${c.yellow('Call ended.')}\r\n`
+                    `${c.yellow(`Call ended.${suffix}`)}\r\n`
                 );
                 break;
+            }
             case 'error':
                 if (event.data?.error) {
                     this.showNotification(
@@ -117,6 +121,12 @@ export class TerminalManager {
     }
 
     private showNotification(message: string): void {
+        // A running command owns the line; exec() writes the prompt when it finishes
+        if (this.running) {
+            this._terminal.write(message);
+            return;
+        }
+
         // Save current line state
         const savedInput = this.input;
         const savedPosition = this.position;
@@ -230,7 +240,12 @@ export class TerminalManager {
         const program = Programs.get(programName);
         if (program) {
             const programInterface = new ProgramInterface(this._terminal, args, this.env, this);
-            await program.run(programInterface)
+            this.running = true;
+            try {
+                await program.run(programInterface)
+            } finally {
+                this.running = false;
+            }
         } else {
             this._terminal.writeln(programName + ": command not found");
         }

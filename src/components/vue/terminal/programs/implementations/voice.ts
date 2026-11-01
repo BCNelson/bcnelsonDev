@@ -102,8 +102,8 @@ async function handleAnswer(pi: ProgramInterface): Promise<number> {
     const voice = pi.voiceService;
 
     try {
+        // The call-connected notification reports the connection
         await voice.answer();
-        await pi.writeln(c.green('Call connected!'));
     } catch (e) {
         await pi.writeln(c.red(`Error: ${e instanceof Error ? e.message : ERROR_MESSAGES.NO_INCOMING_CALL}`));
         return 1;
@@ -116,9 +116,8 @@ async function handleHangup(pi: ProgramInterface): Promise<number> {
     const voice = pi.voiceService;
 
     try {
-        const duration = voice.getCallDuration();
+        // The call-ended notification reports the end and its duration
         voice.hangup();
-        await pi.writeln(c.yellow(`Call ended. Duration: ${voice.formatDuration(duration)}`));
     } catch (e) {
         await pi.writeln(c.red(`Error: ${e instanceof Error ? e.message : ERROR_MESSAGES.NO_ACTIVE_CALL}`));
         return 1;
